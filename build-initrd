@@ -1,0 +1,18 @@
+#! /bin/bash -ex
+
+# Script to build the initial ramdisk
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+brdir=$TOP/external/buildroot-$BRVERSION
+
+(
+	cd $brdir
+	[ ! -z "$1" ] && make clean
+	make
+) # && $TOP/build-kernel
+

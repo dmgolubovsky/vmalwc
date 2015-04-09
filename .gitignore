@@ -10,3 +10,4 @@
 ./external/*
 ./extrafiles/usr
 *~
+./.downloads/*

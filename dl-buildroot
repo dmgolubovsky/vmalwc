@@ -1,0 +1,7 @@
+if [ ! -d $brdir ] ; then
+	mkdir -p $TOP/.downloads
+	mkdir -p $TOP/external
+	( cd $TOP/.downloads ; wget $BRURL )
+	( cd $TOP/external ; tar xjvf $TOP/.downloads/`basename $BRURL` )
+fi
+

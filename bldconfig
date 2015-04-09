@@ -1,0 +1,27 @@
+# Bash script to sell build parameters for KVM, Kernel, Buildroot (initrd)
+
+# Build config for KVM
+
+QEMUVERSION=2.2.0
+
+# List all --enable- flags of qemu configure here, their disables will be excluded
+
+enables='linux-aio system virtfs kvm attr vnc curl'
+
+# List all --enable flags here that do not have --disable counterpart
+
+allows="$enables slirp"
+
+# Build config for buildroot
+
+BRVERSION=2015.02
+BRURL=http://buildroot.net/downloads/buildroot-2015.02.tar.bz2
+
+# Build config for kernel
+
+KERVERSION=3.19
+
+# Build config for ascii2uni
+
+A2UVERSION=4.18
+

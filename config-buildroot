@@ -1,0 +1,21 @@
+#! /bin/bash -ex
+
+# Script to configure the buildroot
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+brdir=$TOP/external/buildroot-$BRVERSION
+
+source $TOP/dl-buildroot
+
+(
+	[ -e $TOP/buildroot-config ] && cp $TOP/buildroot-config $brdir/.config
+	cd $brdir
+	make menuconfig
+	cp $brdir/.config $TOP/buildroot-config
+	grep 'BUSYBOX=y' $TOP/buildroot-config && make busybox-update-config
+)
