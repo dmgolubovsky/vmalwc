@@ -1,0 +1,28 @@
+#! /bin/sh
+#
+# Mount all volumes detected by blkid.
+#
+
+case "$1" in
+	start)
+		echo "Setting up mountable volumes..."
+		blkid -s TYPE | while read ; do
+			dev=$(echo $REPLY | cut -d':' -f 1)
+			fs=$(echo $REPLY | cut -d'=' -f 2 | tr -d \")
+			mpt=/volumes/$(basename $dev)
+			mkdir -p $mpt
+			mount -t $fs $dev $mpt
+		done
+		;;
+	stop)
+		echo -n "Stopping volumes..."
+		for d in /volumes/* ; do
+			mountpoint -q $d && (umount $d || umount -f -l $d)
+		done
+		;;
+	*)
+		echo "Usage $0 {start|stop}"
+		exit 1
+esac
+
+exit $?

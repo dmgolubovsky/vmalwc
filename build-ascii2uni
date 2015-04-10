@@ -1,0 +1,26 @@
+#! /bin/bash -ex
+
+# Script to build ascii2uni statically
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+mkdir -p $TOP/extrafiles/usr/bin
+
+a2udir=$TOP/external/uni2ascii-$A2UVERSION
+
+source $TOP/dl-a2u
+
+(
+	cd $a2udir
+	make clean
+	./configure
+	make CFLAGS=-static
+	strip ascii2uni
+) && cp $a2udir/ascii2uni $TOP/extrafiles/usr/bin
+
+$TOP/build-initrd
+

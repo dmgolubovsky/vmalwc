@@ -1,0 +1,21 @@
+#! /bin/bash -ex
+
+# Script to configure the kernel
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+lxdir=$TOP/external/linux-$KERVERSION
+
+source $TOP/dl-kernel
+
+(
+	[ -e $TOP/kernel-config ] && cp $TOP/kernel-config $lxdir/.config
+	cd $lxdir
+	make menuconfig
+	cp $lxdir/.config $TOP/kernel-config
+)
+

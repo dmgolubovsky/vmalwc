@@ -1,0 +1,16 @@
+#! /bin/sh
+#
+# Mount/umount cgroups
+#
+
+case "$1" in
+	start)
+		cgroupfs-mount
+		;;
+	stop)
+		cgroupfs-umount
+		;;
+	*)
+		echo "Usage $0 {start|stop}"
+		exit 1
+esac

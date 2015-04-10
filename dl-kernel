@@ -1,0 +1,7 @@
+if [ ! -d $lxdir ] ; then
+	mkdir -p $TOP/.downloads
+	mkdir -p $TOP/external
+	( cd $TOP/.downloads ; [ ! -f `basename $KERURL` ] && wget $KERURL )
+	( cd $TOP/external ; tar xJvf $TOP/.downloads/`basename $KERURL` )
+fi
+

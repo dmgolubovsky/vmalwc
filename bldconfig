@@ -19,9 +19,11 @@ BRURL=http://buildroot.net/downloads/buildroot-2015.02.tar.bz2
 
 # Build config for kernel
 
-KERVERSION=3.19
+KERVERSION=3.19.3
+KERURL=https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.19.3.tar.xz
 
 # Build config for ascii2uni
 
 A2UVERSION=4.18
+A2UURL=http://billposer.org/Software/Downloads/uni2ascii-4.18.tar.bz2
 

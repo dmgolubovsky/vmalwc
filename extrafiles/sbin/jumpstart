@@ -1,0 +1,43 @@
+#! /bin/sh
+
+# A script running during the init process. It scans the kernel command line for
+# commands formatted as exec=<encoded command> or exec=none. In the former case,
+# the command is decoded and passed to the target startup shell, in the latter case,
+# the script exits allowing using the VM via serial consoles.
+
+d=""
+sysin=/dev/null
+sysout=/dev/console
+
+for f in `cat /proc/cmdline` ; do
+	case $f in
+		exec=none)
+			exit
+		;;
+		sysin=*)
+			sysin=$(echo -n "$f" | cut -d"=" -f 2)
+		;;
+		sysout=*)
+			sysout=$(echo -n "$f" | cut -d"=" -f 2)
+		;;
+		display=*)
+			export DISPLAY=$(echo -n "$f" | cut -d"=" -f 2)
+		;;
+		pulse=*)
+			export PULSE_SERVER=$(echo -n "$f" | cut -d"=" -f 2)
+		;;
+		exec=@*)
+			d=$(echo -n "$f" | sed 's/^.*\@//' | base64 -d)
+		;;
+		exec=Z*)
+			d=$(echo -n "$f" | sed 's/^.*Z//' | gzip -d - | base64 -d)
+		;;
+		*)
+	esac
+done
+[ ! -z "$d" ] && (
+	echo "$d" | ascii2uni -a L -q | sed 's/^\"//; s/\"$//' | /bin/sh -
+) 3<$sysin 2>&1 >$sysout
+
+echo EXITCODE: $?
+reboot

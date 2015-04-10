@@ -1,0 +1,29 @@
+#! /bin/sh -ex
+
+# Script to do a simple chroot into the given path, pre-mounting
+# certain mountpoints into the chroot first and copying some files over.
+
+[ -z "$2" ] && {
+	echo Usage `basename $0` root command
+	exit 1
+}
+
+for b in /dev /dev/pts /sys /proc /host ; do
+	[ -d $b ] && { 
+		mkdir -p $1/$b
+		mount -o rbind $b $1/$b
+	}
+done
+
+for f in /etc/resolv.conf ; do
+	[ -f $f ] && {
+		mkdir -p $1/`dirname $f`
+		cp $f $1/$f
+	}
+done
+
+nr=$1
+
+shift
+
+exec chroot $nr "$@"

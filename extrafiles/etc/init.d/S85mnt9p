@@ -1,0 +1,23 @@
+#! /bin/sh
+#
+# Find all 9p mount tags and mount them under /host
+#
+
+case "$1" in
+	start)
+		find /sys/devices -name mount_tag | while read ; do
+			tag=`cat $REPLY`
+			mkdir -p /host/$tag
+			mount -t 9p $tag /host/$tag
+		done
+		;;
+	stop)
+		find /sys/devices -name mount_tag | while read ; do
+			tag=`cat $REPLY`
+			umount /host/$tag
+		done
+		;;
+	*)
+		echo "Usage $0 {start|stop}"
+		exit 1
+esac

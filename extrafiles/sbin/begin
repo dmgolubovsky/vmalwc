@@ -1,0 +1,12 @@
+#! /bin/sh
+
+cd /volumes/vda
+tar xzvf /host/archive/ubuntu-core-14.10-core-amd64.tar.gz
+cd /
+cp /etc/resolv.conf /volumes/vda/etc
+mount --bind /proc /volumes/vda/proc
+mount --rbind /dev /volumes/vda/dev
+
+
+chroot /volumes/vda /bin/bash
+

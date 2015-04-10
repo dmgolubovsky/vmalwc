@@ -1,0 +1,18 @@
+#! /bin/bash -ex
+
+# Script to build the kernel
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+lxdir=$TOP/external/linux-$KERVERSION
+
+cp kernel-config $lxdir/.config
+
+(
+	cd $lxdir
+	make -j 6
+)
