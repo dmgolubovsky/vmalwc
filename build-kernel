@@ -10,6 +10,8 @@ source $TOP/bldconfig
 
 lxdir=$TOP/external/linux-$KERVERSION
 
+. $TOP/dl-kernel
+
 cp kernel-config $lxdir/.config
 
 (
