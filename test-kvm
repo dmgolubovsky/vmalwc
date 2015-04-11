@@ -1,0 +1,16 @@
+#! /bin/bash
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+$TOP/bin/fghc -mem 128M \
+	-kernel $TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage \
+	-exec 'ls -l' \
+	-kvm /usr/bin/kvm \
+	-workdir /tmp/ \
+		-step xxx \
+		-exec 'dmesg' | make -f - & 
+			tail --pid $! -q -F /tmp/xxx.consdump 2>/dev/null

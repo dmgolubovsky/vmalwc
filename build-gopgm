@@ -1,0 +1,25 @@
+#! /bin/bash -ex
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+godir=$TOP/external/go
+
+. $TOP/dl-golang
+
+export GOPATH=$TOP 
+export GOROOT=$godir 
+export PATH=$godir/bin:$PATH
+
+DIRS="fghc"
+
+mkdir -p $TOP/bin
+
+for f in $DIRS ; do
+	echo Building in $f...
+	cd $TOP/src/$f ; go get ; go build -ldflags -s -o $TOP/bin/$f
+done
+

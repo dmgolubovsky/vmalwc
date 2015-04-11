@@ -1,0 +1,7 @@
+if [ ! -d $godir ] ; then
+	mkdir -p $TOP/.downloads
+	mkdir -p $TOP/external
+	( cd $TOP/.downloads ; [ ! -f `basename $GOURL` ] && wget $GOURL )
+	( cd $TOP/external ; tar xzvf $TOP/.downloads/`basename $GOURL` )
+fi
+
