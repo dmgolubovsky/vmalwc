@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"os/user"
 	"strings"
 	"strconv"
 	"path/filepath"
@@ -78,6 +79,12 @@ func main () {
 	job.xdisplay = -1
 	job.video = false
 	job.audio = false
+	u, e := user.Current()
+	if e != nil {
+		job.user = nil
+	} else {
+		job.user = u
+	}
 	var skip = false
 	for i := range pargs {
 		if skip {
@@ -90,6 +97,12 @@ func main () {
 				os.Exit(1)
 			case "":
 				break
+			case "-user":
+				if job.user == nil {
+					fmt.Fprintln(os.Stderr, "Cannot obtain current user information")
+					os.Exit(1)
+				}
+				job.uimp = true
 			case "-audio":
 				job.audio = true
 			case "-video":

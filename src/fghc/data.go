@@ -2,6 +2,10 @@
 
 package main
 
+import (
+	"os/user"
+)
+
 type Job struct {
 	kernel string		// which kernel to load
 	kvm string		// path to KVM
@@ -12,6 +16,8 @@ type Job struct {
 	video bool		// if true, video access (X display) is allowed
 	audio bool		// if true, audio access (pulseaudio forwarding) is allowed
 	wdir string		// working directory of the job
+	user *user.User		// host user information
+	uimp bool		// if true, import user home directory into the VM
 }
 
 type LibMapN map [int] *Library
