@@ -20,6 +20,8 @@ type Job struct {
 	steps StepMap		// job steps
 	mmegs int		// default memory for VM
 	xdisplay int		// if positive, enable guestfwd to X server with given display
+	video bool		// if true, video access (X display) is allowed
+	audio bool		// if true, audio access (pulseaudio forwarding) is allowed
 	wdir string		// working directory of the job
 }
 
@@ -181,13 +183,13 @@ func dumpstep(s *Step, j *Job) {
 	}
 	red1 := ""
 	red2 := ""
-	if j.xdisplay >= 0 {
+	if j.video && (j.xdisplay >= 0) {
 		red1 = ",guestfwd=tcp:10.0.2.100:6000-cmd:socat stdio unix-connect:/tmp/.X11-unix/X" + fmt.Sprint(j.xdisplay)
 		kappend = kappend + " display=10.0.2.100:0"
 	}
 	paudio := os.Getenv("PULSE_SERVER")
 	xaudio := os.Getenv("PULSE_EXTERNAL_SERVER")
-	if len(paudio) > 0 {
+	if j.audio && (len(paudio) > 0) {
 		kappend = kappend + " pulse=tcp:10.0.2.200:4713"
 		papts := strings.Split(paudio, "}")
 		pasrv := ""
@@ -199,7 +201,7 @@ func dumpstep(s *Step, j *Job) {
 	
 		}
 		red2 = ",guestfwd=tcp:10.0.2.200:4713-cmd:socat stdio " + pasrv
-	} else if len(xaudio) > 0 {
+	} else if j.audio && (len(xaudio) > 0) {
 		kappend = kappend + " pulse=tcp:10.0.2.200:4713"
 		red2 = ",guestfwd=tcp:10.0.2.200:4713-cmd:socat stdio " + xaudio
 	}
@@ -286,6 +288,8 @@ func main () {
 	job.libmap = []*Library{}
 	job.steps = StepMap{}
 	job.xdisplay = -1
+	job.video = false
+	job.audio = false
 	var skip = false
 	for i := range pargs {
 		if skip {
@@ -298,6 +302,10 @@ func main () {
 				os.Exit(1)
 			case "":
 				break
+			case "-audio":
+				job.audio = true
+			case "-video":
+				job.video = true
 			case "-kernel":
 				i++
 				job.kernel = pargs[i]
