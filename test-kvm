@@ -9,8 +9,10 @@ source $TOP/bldconfig
 $TOP/bin/fghc -mem 128M \
 	-kernel $TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage \
 	-exec 'ls -l' \
-	-kvm /usr/bin/kvm \
+	-kvm $TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64 \
 	-workdir /tmp/ \
 		-step xxx.$$ \
-		-exec 'dmesg' | make -f - & 
+		-lib here -path $TOP -type 9p -rw \
+		-sysout /host/here/test-kvm.sysout \
+		-exec 'dmesg ; mount' | make -f - & 
 			tail --pid $! -q -F /tmp/xxx.consdump 2>/dev/null

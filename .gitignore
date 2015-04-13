@@ -11,4 +11,5 @@ external/**
 extrafiles/usr/**
 *~
 *.swp
+*.sysout
 .downloads/**

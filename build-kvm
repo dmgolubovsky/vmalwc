@@ -1,0 +1,32 @@
+#! /bin/bash -ex
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+qdir=$TOP/external/qemu-$QEMUVERSION
+
+source $TOP/dl-qemu
+
+dodisables=""
+doenables=""
+
+for e in $disables ; do
+	dodisables="$dodisables|--disable-$e"
+done
+
+for e in $enables ; do
+	doenables="$doenables --enable-$e"
+done
+
+(
+	cd $qdir 
+	(make -s clean 2>/dev/null || true) 
+	./configure --target-list=x86_64-softmmu $doenables $dodisables
+	make -j 4
+	strip x86_64-softmmu/qemu-system-x86_64
+)
+
+

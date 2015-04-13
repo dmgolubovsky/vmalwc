@@ -2,7 +2,8 @@
 
 # Build config for KVM
 
-QEMUVERSION=2.2.0
+QEMUVERSION=2.3.0-rc2
+QEMUURL=http://wiki.qemu-project.org/download/qemu-2.3.0-rc2.tar.bz2
 
 # List all --enable- flags of qemu configure here, their disables will be excluded
 
