@@ -1,0 +1,6 @@
+language: c
+compiler:
+        - gcc
+
+script: TOP=`pwd` $TOP/ci-common
+
