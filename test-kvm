@@ -6,13 +6,19 @@ TOP=`dirname $0`
 
 source $TOP/bldconfig
 
+mkdir -p $HOME/.ulibtest
+
+echo aaa > $HOME/.ulibtest/aaa
+
 $TOP/bin/fghc -mem 128M \
 	-kernel $TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage \
 	-exec 'ls -l' \
 	-kvm $TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64 \
 	-workdir /tmp/ \
+	-user \
 		-step xxx.$$ \
 		-lib here -path $TOP -type 9p -rw \
+		-lib ult -path $HOME/.ulibtest -type 9p -ro -tag .ulibtest \
 		-sysout /host/here/test-kvm.sysout \
-		-exec 'dmesg ; mount' | make -f - & 
-			tail --pid $! -q -F /tmp/xxx.consdump 2>/dev/null
+		-exec 'dmesg; mount; cat /proc/cmdline; ls -l $homebase/.ulibtest' | make -f - & 
+			tail --pid $! -q -F $TOP/test-kvm.sysout 2>/dev/null

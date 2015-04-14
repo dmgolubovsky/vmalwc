@@ -63,6 +63,12 @@ func dumpstep(s *Step, j *Job) {
 	for i, l := range s.libmap {
 		prlib(i, l)
 	}
+	if j.uimp {
+		kappend = kappend + " user=" + j.user.Name
+		kappend = kappend + " uid=" + j.user.Uid
+		kappend = kappend + " gid=" + j.user.Gid
+		kappend = kappend + " homebase=" + j.user.HomeDir
+	}
 	red1 := ""
 	red2 := ""
 	if j.video && (j.xdisplay >= 0) {
@@ -115,8 +121,8 @@ func nplib(i int, l *Library) {
 	if l.write {
 		ro = ""
 	}
-	fmt.Println("\t -virtfs local" + ro + ",id=" + l.tag +
-		    ",path=" + l.path + ",mount_tag=" + l.tag + ",security_model=mapped \\")
+	fmt.Println("\t -fsdev local" + ro + ",id=" + l.id + ",path=" + l.path + ",security_model=mapped \\")
+	fmt.Println("\t -device virtio-9p-pci,fsdev=" + l.id + ",mount_tag=" + l.tag + " \\")
 }
 
 func rawlib(i int, l *Library) {

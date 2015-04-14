@@ -7,8 +7,17 @@ case "$1" in
 	start)
 		find /sys/devices -name mount_tag | while read ; do
 			tag=`cat $REPLY`
-			mkdir -p /host/$tag
-			mount -t 9p $tag /host/$tag
+			case "$tag" in
+				H\#*)
+					mtag=`echo -n "$tag" | sed 's/^H#//g'`
+					base=$homebase
+				;;
+				*)
+					mtag="$tag"
+					base=/host
+			esac
+			mkdir -p $base/$mtag
+			mount -t 9p $tag $base/$mtag
 		done
 		;;
 	stop)

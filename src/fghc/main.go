@@ -158,6 +158,7 @@ func main () {
 				curlib = newlib()
 				curlib.name = pargs[i]
 				curlib.tag = curlib.name
+				curlib.id = curlib.name
 				curlib.snap = false
 				if curlib.name[0] == '@' {
 					curlib.libtype = REF
@@ -173,6 +174,9 @@ func main () {
 				i++
 				if curlib != nil {
 					curlib.tag = pargs[i]
+					if job.uimp && strings.HasPrefix(curlib.path, job.user.HomeDir) {
+						curlib.tag = "H#" + curlib.tag
+					}
 				}
 				skip = true
 			case "-path":
