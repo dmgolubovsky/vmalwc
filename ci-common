@@ -1,0 +1,41 @@
+#! /bin/sh
+
+# Common build script
+
+export PATH=/usr/sbin:$PATH
+
+rm -rf $TOP/.downloads
+
+rm -rf $TOP/external
+
+[ $TOP = "." ] && TOP=`pwd`
+
+. $TOP/bldconfig
+
+brdir=$TOP/external/buildroot-$BRVERSION
+
+. $TOP/dl-buildroot
+
+(
+	cd $brdir
+
+	cp $TOP/buildroot-config $brdir/.config
+
+	grep 'BUSYBOX=y' $TOP/buildroot-config && make busybox-update-config
+
+)
+
+$TOP/build-initrd clean
+
+$TOP/build-ascii2uni
+
+. $TOP/dl-kernel
+
+$TOP/build-kernel
+
+$TOP/build-gopgm
+
+$TOP/build-kvm
+
+$TOP/test-kvm
+
