@@ -2,5 +2,5 @@ language: c
 compiler:
         - gcc
 
-script: TOP=./vmalwc $TOP/ci-common
+script: TOP=`pwd` ./ci-common
 
