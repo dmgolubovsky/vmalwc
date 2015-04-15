@@ -16,9 +16,14 @@ $TOP/bin/fghc -mem 128M \
 	-kvm $TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64 \
 	-workdir /tmp/ \
 	-user \
-		-step xxx.$$ \
-		-lib here -path $TOP -type 9p -rw \
-		-lib ult -path $HOME/.ulibtest -type 9p -ro -tag .ulibtest \
-		-sysout /host/here/test-kvm.sysout \
-		-exec 'chroot --version ; chroot --help' | make -f - & 
-			tail --pid $! -q -F $TOP/test-kvm.sysout 2>/dev/null
+		-step fmtvol$$ \
+			-lib vol0 -new 512M -rw -type qcow2 \
+			-exec 'mkfs.ext2 /dev/vda' \
+		-step xxx$$ \
+			-lib @fmtvol$$.vol0 \
+			-lib here -path $TOP -type 9p -rw \
+			-lib ult -path $HOME/.ulibtest -type 9p -ro -tag .ulibtest \
+			-sysout /host/here/test-kvm.sysout \
+			-sysin /host/here/test-kvm.sysin \
+			-exec 'sh /proc/self/fd/3 ' | make -f - & 
+tail --pid $! -q -F $TOP/test-kvm.sysout 2>/dev/null
