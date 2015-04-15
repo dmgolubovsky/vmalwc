@@ -20,5 +20,5 @@ $TOP/bin/fghc -mem 128M \
 		-lib here -path $TOP -type 9p -rw \
 		-lib ult -path $HOME/.ulibtest -type 9p -ro -tag .ulibtest \
 		-sysout /host/here/test-kvm.sysout \
-		-exec 'dmesg; mount; cat /proc/cmdline; ls -l $homebase/.ulibtest' | make -f - & 
+		-exec 'chroot --version ; chroot --help' | make -f - & 
 			tail --pid $! -q -F $TOP/test-kvm.sysout 2>/dev/null

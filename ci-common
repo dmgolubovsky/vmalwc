@@ -1,6 +1,6 @@
-#! /bin/sh
+#! /bin/sh -ex
 
-# Common build script
+# Common build script. Preset the TOP env variable to theroot of the build.
 
 export PATH=/usr/sbin:$PATH
 

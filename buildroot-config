@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Buildroot 2015.02-g4eaca9a Configuration
+# Buildroot 2015.02-g6ff57e0-dirty Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 
@@ -1904,7 +1904,7 @@ BR2_PACKAGE_SOCAT=y
 BR2_PACKAGE_ACL=y
 BR2_PACKAGE_ATTR=y
 # BR2_PACKAGE_BOOTUTILS is not set
-# BR2_PACKAGE_COREUTILS is not set
+BR2_PACKAGE_COREUTILS=y
 # BR2_PACKAGE_CPULOAD is not set
 # BR2_PACKAGE_DCRON is not set
 # BR2_PACKAGE_DEBIANUTILS is not set
