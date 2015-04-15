@@ -3,6 +3,11 @@
 # Script to do a simple chroot into the given path, pre-mounting
 # certain mountpoints into the chroot first and copying some files over.
 
+# If import of the host user was specified in the kernel command line
+# attempt to create the used in the chroot and then chroot to the
+# target program as the host user. Programs like adduser and addgroup
+# are expected in the chroot.
+
 [ -z "$2" ] && {
 	echo Usage `basename $0` root command
 	exit 1
@@ -26,4 +31,12 @@ nr=$1
 
 shift
 
-exec chroot $nr "$@"
+if [ -z "$user" ] || [ -z "$gid" ] || [ -z "$uid" ]  ; then
+	exec chroot $nr "$@"
+else
+	chroot $nr addgroup --gid $gid $user &&
+	echo Y | chroot $nr adduser --uid $uid --gid $gid --no-create-home \
+			--home $homebase --disabled-login $user &&
+	HOME=$homebase exec chroot --userspec $uid:$gid $nr "$@"
+fi
+
