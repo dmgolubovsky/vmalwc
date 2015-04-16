@@ -64,7 +64,13 @@ func dumpstep(s *Step, j *Job) {
 		prlib(i, l)
 	}
 	if j.uimp {
-		kappend = kappend + " user=" + j.user.Name
+		var usrname = ""
+		if len(j.user.Name) > 0 {
+			usrname = j.user.Name
+		} else {
+			usrname = "host_user"
+		}
+		kappend = kappend + " user=" + usrname
 		kappend = kappend + " uid=" + j.user.Uid
 		kappend = kappend + " gid=" + j.user.Gid
 		kappend = kappend + " homebase=" + j.user.HomeDir
