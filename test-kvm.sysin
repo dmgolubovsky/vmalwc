@@ -1,5 +1,8 @@
 cd /volumes/vda ; wget http://cdimage.ubuntu.com/ubuntu-core/releases/14.10/release/ubuntu-core-14.10-core-amd64.tar.gz -O - | tar xz
 
-mchroot /volumes/vda mount
-mchroot /volumes/vda ls -al $homebase
+cat /proc/cmdline
+echo "*** mchroot user-less ***"
+user= mchroot /volumes/vda mount
+echo "*** mchroot user-enabled ***"
+mchroot /volumes/vda sh -c 'mount ; ls -al $homebase'
 
