@@ -22,7 +22,7 @@ $TOP/bin/fghc -mem 128M \
 		-step xxx$$ \
 			-lib @fmtvol$$.vol0 \
 			-lib here -path $TOP -type 9p -rw \
-			-lib ult -path $HOME/.ulibtest -type 9p -ro -tag .ulibtest \
+			-lib ult -path $HOME/.ulibtest -type 9p -ro -utag .ulibtest \
 			-sysout /host/here/test-kvm.sysout \
 			-sysin /host/here/test-kvm.sysin \
 			-exec 'sh /proc/self/fd/3 ' | make -f - & 

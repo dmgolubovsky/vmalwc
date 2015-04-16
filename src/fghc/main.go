@@ -170,13 +170,16 @@ func main () {
 					curlib.libtype = NOTSET
 				}
 				skip = true
+			case "-utag":
+				i++
+				if curlib != nil && job.uimp && strings.HasPrefix(curlib.path, job.user.HomeDir) {
+					curlib.tag = "H#" + pargs[i]
+				}
+				skip = true
 			case "-tag":
 				i++
 				if curlib != nil {
 					curlib.tag = pargs[i]
-					if job.uimp && strings.HasPrefix(curlib.path, job.user.HomeDir) {
-						curlib.tag = "H#" + curlib.tag
-					}
 				}
 				skip = true
 			case "-path":
