@@ -37,6 +37,6 @@ $TOP/build-gopgm
 
 $TOP/build-kvm
 
-$TOP/test-kvm
+kvm-ok && $TOP/test-kvm
 
 
