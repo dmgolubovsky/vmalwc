@@ -3,7 +3,7 @@
 # Build config for KVM
 
 QEMUVERSION=2.3.0-rc2
-QEMUURL=http://wiki.qemu-project.org/download/qemu-2.3.0-rc2.tar.bz2
+QEMUURL=http://wiki.qemu-project.org/download/${QEMUVERSION}.tar.bz2
 
 # List all --enable- flags of qemu configure here, their disables will be excluded
 
@@ -16,7 +16,7 @@ allows="$enables slirp"
 # Build config for buildroot
 
 BRVERSION=2015.02
-BRURL=http://buildroot.net/downloads/buildroot-2015.02.tar.bz2
+BRURL=http://buildroot.net/downloads/buildroot-${BRVERSION}.tar.bz2
 
 # Build config for kernel
 

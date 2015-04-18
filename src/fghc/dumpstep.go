@@ -139,7 +139,7 @@ func rawlib(i int, l *Library) {
 	fmt.Println("\t -device virtio-blk,drive=drive" + fmt.Sprint(i) + 
 		    ",scsi=off,config-wce=off,x-data-plane=on \\")
 	fmt.Print("\t -drive if=none,id=drive" + fmt.Sprint(i) + 
-	          ",cache=none,aio=native,format=raw" + ro + ",file=" + l.path)
+	          ",cache.direct=on,aio=native,format=raw" + ro + ",file=" + l.path)
 	commonlib(i, l)
 }
 
@@ -151,7 +151,7 @@ func httplib(i int, l *Library) {
 	fmt.Println("\t -device virtio-blk,drive=drive" + fmt.Sprint(i) + 
 		    ",scsi=off,config-wce=off \\")
 	fmt.Print("\t -drive if=none,id=drive" + fmt.Sprint(i) + 
-	          ",cache=none,aio=native,format=http" + ro + ",url=" + l.path)
+	          ",cache.direct=on,aio=native,format=http" + ro + ",url=" + l.path)
 	commonlib(i, l)
 }
 
@@ -163,7 +163,7 @@ func qcwlib(i int, l *Library) {
 	fmt.Println("\t -device virtio-blk,drive=drive" + fmt.Sprint(i) + 
 		    ",scsi=off,config-wce=off \\")
 	fmt.Print("\t -drive if=none,id=drive" + fmt.Sprint(i) + 
-	          ",cache=none,aio=native,format=qcow2" + ro + ",file=" + l.path)
+	          ",aio=native,format=qcow2,cache.direct=on" + ro + ",file=" + l.path)
 	commonlib(i, l)
 }
 

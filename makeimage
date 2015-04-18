@@ -1,0 +1,30 @@
+#! /bin/bash
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+[ -z $4 ] && {
+	echo Usage `basename $0` from_image to_image sysin sysout
+}
+
+from_image="$1"
+to_image="$2"
+sysin="$3"
+sysout="$4"
+
+source $TOP/bldconfig
+
+KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
+KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
+
+$TOP/bin/fghc -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ \
+	-step makeimage$$ \
+		-lib from -from $from_image -save $to_image -type qcow2 -rw \
+		-lib inlib -path `dirname $sysin` -type 9p -ro \
+		-lib outlib -path `dirname $sysout` -type 9p -rw \
+		-exec 'mchroot /volumes/vda bash /proc/self/fd/3' \
+		-sysin /host/inlib/`basename $sysin` \
+	       	-sysout /host/outlib/`basename $sysout` | make -f - &
+
+tail --pid $! -q -F $sysout 2>/dev/null

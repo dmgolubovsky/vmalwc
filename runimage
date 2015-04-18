@@ -1,0 +1,59 @@
+#! /bin/bash -ex
+
+[ -z $2 ] && {
+	echo Usage: `basename $0` image command args
+	exit 1
+}
+
+[ ! -f $1 ] && [[ ! $1 =~ ^http:// ]] && {
+	echo Volume image $1 does not exist
+	exit 1
+}
+
+if [[ $1 =~ ^http:// ]] ; then
+
+	otype='-type'
+	vtype='http'
+
+else
+
+	vt=$(file $1 | grep -i "QEMU QCOW" | wc -l)
+
+	otype=-type
+
+	if [ "$vt" = 1 ] ; then
+		vtype=qcow2
+	else
+		vtype=raw
+	fi
+
+fi
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
+KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
+
+vol=$1
+
+shift 
+
+xcmd="$@"
+
+eval `pax11publish -i`
+
+XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
+
+$TOP/bin/fghc -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ \
+	-xdisplay $XDISPLAY -video -audio -user \
+		-step runcmd$$ -mem 1G \
+			-lib vol0 -path $vol -snap -rw $otype $vtype \
+			-exec "mchroot /volumes/vda $xcmd" | make -f -
+
+
+
+
