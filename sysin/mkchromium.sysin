@@ -14,7 +14,7 @@ apt-get -y install software-properties-common
 add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic universe multiverse"
 add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic-updates universe multiverse"
 apt-get -y update
-apt-get -y install chromium-browser libgl1-mesa-glx mesa-utils gstreamer1.0-libav
+apt-get -y install chromium-browser libgl1-mesa-glx mesa-utils chromium-codecs-ffmpeg-extra pulseaudio-utils
 apt-get clean
 
 

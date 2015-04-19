@@ -163,7 +163,7 @@ func qcwlib(i int, l *Library) {
 	fmt.Println("\t -device virtio-blk,drive=drive" + fmt.Sprint(i) + 
 		    ",scsi=off,config-wce=off \\")
 	fmt.Print("\t -drive if=none,id=drive" + fmt.Sprint(i) + 
-	          ",aio=native,format=qcow2,cache.direct=on" + ro + ",file=" + l.path)
+	          ",cache.direct=on,aio=native,format=qcow2" + ro + ",file=" + l.path)
 	commonlib(i, l)
 }
 
