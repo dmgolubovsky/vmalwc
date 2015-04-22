@@ -29,6 +29,12 @@ else
 
 fi
 
+if [ ! -z "$DESKTOP" ] ; then
+	app="-app $DESKTOP"
+else
+	app=""
+fi
+
 TOP=`dirname $0`
 
 [ $TOP = "." ] && TOP=`pwd`
@@ -49,7 +55,7 @@ eval `pax11publish -i`
 XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
 
 $TOP/bin/fghc -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ \
-	-xdisplay $XDISPLAY -video -audio -user \
+	-xdisplay $XDISPLAY -video -audio -user $app \
 		-step runcmd$$ -mem 1G \
 			-lib vol0 -path $vol -snap -rw $otype $vtype \
 			-exec "mchroot /volumes/vda $xcmd" | make -f -

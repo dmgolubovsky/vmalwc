@@ -103,6 +103,10 @@ func main () {
 					os.Exit(1)
 				}
 				job.uimp = true
+			case "-app":
+				i++
+				job.desktop = pargs[i]
+				skip = true
 			case "-audio":
 				job.audio = true
 			case "-video":
@@ -268,6 +272,10 @@ func main () {
 				skip = true
 		}
 	}
+
+// If app config was specified, process it.
+
+	appconfig()
 
 	fmt.Print("all: alltarg cleanafter")
 	vbreak()

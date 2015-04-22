@@ -18,6 +18,7 @@ type Job struct {
 	wdir string		// working directory of the job
 	user *user.User		// host user information
 	uimp bool		// if true, import user home directory into the VM
+	desktop string		// path to the .desktop file that started the job - only used if -user was specified
 }
 
 type LibMapN map [int] *Library
