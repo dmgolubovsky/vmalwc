@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Buildroot 2015.02-g6ff57e0-dirty Configuration
+# Buildroot 2015.02-gfcd3100-dirty Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 
@@ -1121,7 +1121,7 @@ BR2_PACKAGE_WEBKIT_ARCH_SUPPORTS=y
 # benejson needs a toolchain w/ C++
 #
 # BR2_PACKAGE_CJSON is not set
-# BR2_PACKAGE_EXPAT is not set
+BR2_PACKAGE_EXPAT=y
 # BR2_PACKAGE_EZXML is not set
 # BR2_PACKAGE_JANSSON is not set
 # BR2_PACKAGE_JSON_C is not set
@@ -1302,6 +1302,10 @@ BR2_PACKAGE_CANFESTIVAL_ARCH_SUPPORTS=y
 # BR2_PACKAGE_NEON is not set
 
 #
+# nss-mdns needs an (e)glibc toolchain
+#
+
+#
 # omniORB needs a toolchain w/ C++, threads
 #
 # BR2_PACKAGE_OPENLDAP is not set
@@ -1400,7 +1404,7 @@ BR2_PACKAGE_LIBBSD_ARCH_SUPPORTS=y
 #
 # libcgroup needs an (e)glibc toolchain w/ C++
 #
-# BR2_PACKAGE_LIBDAEMON is not set
+BR2_PACKAGE_LIBDAEMON=y
 # BR2_PACKAGE_LIBEE is not set
 # BR2_PACKAGE_LIBEV is not set
 # BR2_PACKAGE_LIBEVDEV is not set
@@ -1563,7 +1567,10 @@ BR2_PACKAGE_LIBNSPR_ARCH_SUPPORT=y
 #
 # atftp needs a toolchain w/ threads, IPv6
 #
-# BR2_PACKAGE_AVAHI is not set
+BR2_PACKAGE_AVAHI=y
+# BR2_PACKAGE_AVAHI_AUTOIPD is not set
+BR2_PACKAGE_AVAHI_DAEMON=y
+# BR2_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY is not set
 # BR2_PACKAGE_AXEL is not set
 # BR2_PACKAGE_BANDWIDTHD is not set
 

@@ -10,6 +10,9 @@ source $TOP/bldconfig
 
 brdir=$TOP/external/buildroot-$BRVERSION
 
+cp /etc/localtime $TOP/extrafiles/etc
+cp /etc/timezone $TOP/extrafiles/etc
+
 (
 	cd $brdir
 	[ ! -z "$1" ] && make clean

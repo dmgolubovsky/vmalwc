@@ -13,3 +13,5 @@ extrafiles/usr/**
 *.swp
 *.sysout
 .downloads/**
+extrafiles/etc/localtime
+extrafiles/etc/timezone

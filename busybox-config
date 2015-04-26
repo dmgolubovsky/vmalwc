@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Busybox version: 1.23.1
-# Tue Apr 21 11:33:35 2015
+# Sun Apr 26 01:27:26 2015
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -469,8 +469,8 @@ CONFIG_FEATURE_MESG_ENABLE_ONLY_GROUP=y
 # CONFIG_ADD_SHELL is not set
 # CONFIG_REMOVE_SHELL is not set
 CONFIG_FEATURE_SHADOWPASSWDS=y
-# CONFIG_USE_BB_PWD_GRP is not set
-# CONFIG_USE_BB_SHADOW is not set
+CONFIG_USE_BB_PWD_GRP=y
+CONFIG_USE_BB_SHADOW=y
 CONFIG_USE_BB_CRYPT=y
 # CONFIG_USE_BB_CRYPT_SHA is not set
 CONFIG_ADDUSER=y

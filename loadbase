@@ -1,0 +1,22 @@
+#! /bin/bash -ex
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
+KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
+
+$TOP/bin/fghc -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ \
+	-step loadbase$$ | make -f - &
+
+FONT=${FONT:--xos4-terminus-medium-r-normal--18-180-72-72-c-100-iso10646-1}
+
+sleep 0.5
+
+xterm -fn $FONT -fg lightgreen -bg black \
+	-e socat 'stdio,raw,echo=0' "unix-connect:/tmp/loadbase$$.vcons1"
+
+

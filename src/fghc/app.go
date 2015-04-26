@@ -7,6 +7,16 @@ import (
 	"github.com/dmgolubovsky/mini"
 )
 
+/*
+ * This function parses the desktop entry file if it is provided, filling in some information
+ * as if it were obtained from the command line options (and the subsequent command line options
+ * can override the desktop entry file settings.
+ * 
+ * The desktop entry parser expects group headers identifying settings for the whole job,
+ * for each step, for each library within step.
+ * 
+ */
+
 func appconfig() {
 	if len(job.desktop) == 0 {
 		return
@@ -27,6 +37,15 @@ func appconfig() {
 	}
 	sect := c.SectionNames()
 	for s := range sect {
-		fmt.Fprintln(os.Stderr, "["+sect[s]+"]")
+		switch(sect[s]) {
+			case "Desktop Entry":
+				continue
+			case "Job":
+				processjob()
+			default:
+		}
 	}
+}
+
+func processjob() {
 }
