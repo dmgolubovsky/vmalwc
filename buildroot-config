@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Buildroot 2015.02-gfcd3100-dirty Configuration
+# Buildroot 2015.02-g44c8d75-dirty Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 
@@ -458,6 +458,7 @@ BR2_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS=y
 #
 # BR2_PACKAGE_BINUTILS is not set
 # BR2_PACKAGE_BSDIFF is not set
+# BR2_PACKAGE_BUSTLE is not set
 
 #
 # cppunit needs a toolchain w/ C++, dynamic library
@@ -666,7 +667,13 @@ BR2_PACKAGE_QT5_JSCORE_AVAILABLE=y
 # BR2_PACKAGE_CDRKIT is not set
 # BR2_PACKAGE_CRYPTSETUP is not set
 # BR2_PACKAGE_CWIID is not set
-# BR2_PACKAGE_DBUS is not set
+BR2_PACKAGE_DBUS=y
+
+#
+# dbus-c++ needs a toolchain w/ C++, threads
+#
+# BR2_PACKAGE_DBUS_GLIB is not set
+# BR2_PACKAGE_DBUS_TRIGGERD is not set
 # BR2_PACKAGE_DEVMEM2 is not set
 # BR2_PACKAGE_DMIDECODE is not set
 # BR2_PACKAGE_DMRAID is not set

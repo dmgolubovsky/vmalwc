@@ -12,11 +12,12 @@ KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
 $TOP/bin/fghc -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ \
 	-step loadbase$$ | make -f - &
 
-FONT=${FONT:--xos4-terminus-medium-r-normal--18-180-72-72-c-100-iso10646-1}
+FONT=${FONT:-terminus-18}
 
-sleep 0.5
+sleep 2
 
 xterm -fn $FONT -fg lightgreen -bg black \
 	-e socat 'stdio,raw,echo=0' "unix-connect:/tmp/loadbase$$.vcons1"
 
+echo quit | socat stdio "unix-connect:/tmp/loadbase$$.monitor"
 

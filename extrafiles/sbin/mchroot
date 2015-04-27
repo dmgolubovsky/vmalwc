@@ -15,7 +15,9 @@
 
 [ -z "$user" ] && homebase=""
 
-for b in /dev /dev/pts /sys /proc /host $homebase ; do
+for b in /dev /dev/pts /sys /proc /host $homebase \
+	/var/run/avahi-daemon /run/avahi-daemon \
+	/var/run/dbus /run/dbus ; do
 	[ -d $b ] && { 
 		mkdir -p $1/$b
 		mountpoint -q $1/$b || mount -o rbind $b $1/$b
