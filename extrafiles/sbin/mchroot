@@ -24,7 +24,7 @@ for b in /dev /dev/pts /sys /proc /host $homebase \
 	}
 done
 
-for f in /etc/resolv.conf ; do
+for f in /etc/resolv.conf /etc/localtime /etc/timezone ; do
 	[ -f $f ] && {
 		mkdir -p $1/`dirname $f`
 		cp $f $1/$f

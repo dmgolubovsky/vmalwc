@@ -3,9 +3,11 @@
 package main
 
 import (
+	"io"
 	"os"
 	"fmt"
 	"os/user"
+	"os/exec"
 	"strings"
 	"strconv"
 	"path/filepath"
@@ -13,9 +15,9 @@ import (
 )
 
 
-func vbreak () {
-	fmt.Println()
-	fmt.Println()
+func vbreak (w io.WriteCloser) {
+	fmt.Fprintln(w)
+	fmt.Fprintln(w)
 }
 
 var job = Job {}
@@ -111,6 +113,8 @@ func main () {
 				job.audio = true
 			case "-video":
 				job.video = true
+			case "-make":
+				job.make = true
 			case "-kernel":
 				i++
 				job.kernel = pargs[i]
@@ -148,6 +152,11 @@ func main () {
 					curstep.sysout = pargs[i]
 				}
 				skip = true
+			case "-host":
+				i++
+				if curstep != nil {
+					curstep.host = true
+				}
 			case "-xdisplay":
 				i++
 				x, e := strconv.ParseInt(pargs[i], 10, 32)
@@ -277,15 +286,42 @@ func main () {
 
 	appconfig()
 
-	fmt.Print("all: alltarg cleanafter")
-	vbreak()
+// If -make was given, redirect stdout to make -f -
+
+	var p io.WriteCloser
+	var mkpr *exec.Cmd
+	
+	p = os.Stdout
+	mkpr = nil
+
+	if job.make {
+		mkpr = exec.Command("make", "-f", "-")
+		if mkpr == nil {
+			fmt.Fprintln(os.Stderr, "cannot pipe to make")
+			os.Exit(1)
+		}
+		p, e = mkpr.StdinPipe()
+		if e != nil {
+			fmt.Fprintln(os.Stderr, "cannot pipe to make: ", e)
+			os.Exit(1)
+		}
+		mkpr.Stdout = os.Stdout
+		mkpr.Start()
+		if e != nil {
+			fmt.Fprintln(os.Stderr, "cannot start make: ", e)
+			os.Exit(1)
+		}
+	}
+
+	fmt.Fprint(p, "all: alltarg cleanafter")
+	vbreak(p)
 
 // Append all steps to the toplevel target.
 	
 	for s := range job.steps {
 		alltarg = append(alltarg, "step_" + job.steps[s].name)
 	}
-	vbreak()
+	vbreak(p)
 
 // For each step if there are new-created libraries, step depends on their creation.
 // Each new-created library is an cleanafteriate target to be deleted at the end.
@@ -309,22 +345,22 @@ func main () {
 					dep := "create_lib_" + s.name + "_" + l.name
 					s.add_dep(dep)
 					cleanafter = append(cleanafter, l.path)
-					fmt.Println(dep + ":")
-					fmt.Println("\trm -f " + l.path)
+					fmt.Fprintln(p, dep + ":")
+					fmt.Fprintln(p, "\trm -f " + l.path)
 					switch(l.libtype) {
 						case RAW:
-							fmt.Print("\tfallocate -l " + 
+							fmt.Fprint(p, "\tfallocate -l " + 
 								  fmt.Sprint(l.newsize) + "M " + 
 								  l.path)
 						case QCOW2:
-							fmt.Print("\tqemu-img create -f qcow2 " + 
+							fmt.Fprint(p, "\tqemu-img create -f qcow2 " + 
 								  l.path + " " + 
 								  fmt.Sprint(l.newsize) + "M")
 						default:
 							fmt.Fprintln(os.Stderr, "new library wrong format")
 							os.Exit(1)
 					}
-					vbreak()
+					vbreak(p)
 					continue
 				}
 				if len(l.from) > 0 {
@@ -332,9 +368,9 @@ func main () {
 					dep := "copy_lib_" + s.name + "_" + l.name
 					s.add_dep(dep)
 					cleanafter = append(cleanafter, l.path)
-					fmt.Println(dep + ":")
-					fmt.Println("\tcp " + l.from + " " + l.path)
-					vbreak()
+					fmt.Fprintln(p, dep + ":")
+					fmt.Fprintln(p, "\tcp " + l.from + " " + l.path)
+					vbreak(p)
 					continue
 				}
 				if l.name[0] != '@' {
@@ -355,45 +391,51 @@ func main () {
 
 // Dump toplevel targets.
 
-	fmt.Print("alltarg:")
+	fmt.Fprint(p, "alltarg:")
 	for _, t := range alltarg {
-		fmt.Print(" " + t)
+		fmt.Fprint(p, " " + t)
 	}
-	vbreak()
+	vbreak(p)
 
 // Dump recipes to save each library that needs to be saved.
 
 	for _, l := range savelibs {
-		fmt.Println("save_lib_" + l.stname + "_" + l.name + ": " + "step_" + l.stname)
+		fmt.Fprintln(p, "save_lib_" + l.stname + "_" + l.name + ": " + "step_" + l.stname)
 		pl := l
 		if l.reflib != nil {
 			pl = l.reflib
 		}
-		fmt.Print("\tcp " + pl.path + " " + l.save)
-		vbreak()
+		fmt.Fprint(p, "\tcp " + pl.path + " " + l.save)
+		vbreak(p)
 	}
 
 // Dump recipes for each step, listing dependencies first.
 
 	for _, s := range job.steps {
-		fmt.Print("step_" + s.name + ":")
+		fmt.Fprint(p, "step_" + s.name + ":")
 		for _, d := range s.deps {
-			fmt.Print(" " + d)
+			fmt.Fprint(p, " " + d)
 		}
-		fmt.Println("")
-		dumpstep(s, &job)
-		vbreak()
+		fmt.Fprintln(p, "")
+		dumpstep(p, s, &job)
+		vbreak(p)
 	}
 
 // Dump cleanafter targets.
 
-	fmt.Println("cleanafter: alltarg")
+	fmt.Fprintln(p, "cleanafter: alltarg")
 	if len(cleanafter) > 0 {
-		fmt.Print("\trm -f")
+		fmt.Fprint(p, "\trm -f")
 		for _, t := range cleanafter {
-			fmt.Print(" \\\n\t " + t)
+			fmt.Fprint(p, " \\\n\t " + t)
 		}
 	}
-	vbreak()
+	vbreak(p)
+	
+	p.Close()
+
+	if mkpr != nil {
+		mkpr.Wait()
+	}
 
 }

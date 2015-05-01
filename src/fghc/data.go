@@ -18,6 +18,7 @@ type Job struct {
 	wdir string		// working directory of the job
 	user *user.User		// host user information
 	uimp bool		// if true, import user home directory into the VM
+	make bool		// if true redirect output to make -f -
 	desktop string		// path to the .desktop file that started the job - only used if -user was specified
 }
 
@@ -52,6 +53,7 @@ type Step struct {
 	sysout string		// path to redirect standard output (/dev/console)
 	deps []string		// step target dependencies
 	after []string		// wait for these steps to complete
+	host bool		// if true, it is possible to submit jobs on the host
 }
 
 func (s *Step) add_dep(dep string) () {
