@@ -23,10 +23,17 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	fmt.Fprintln(p, "\t" + j.kvm + enkvm + " -vga none -no-reboot \\")
 	fmt.Fprintln(p, "\t -kernel " + j.kernel + " \\")
 	msize := j.mmegs
-	monpath := filepath.Join(j.wdir, s.name + ".monitor")
-	consdump := filepath.Join(j.wdir, s.name + ".consdump")
+	rand := j.id
+	if len(rand) == 0 {
+		rand = "$$PPID"
+	}
+	rstep := rand + "." + s.name
+	pidfile := filepath.Join(j.wdir, rstep + ".pid")
+	monpath := filepath.Join(j.wdir, rstep + ".monitor")
+	consdump := filepath.Join(j.wdir, rstep + ".consdump")
 	cleanafter = append(cleanafter, monpath)
 	cleanafter = append(cleanafter, consdump)
+	cleanafter = append(cleanafter, pidfile)
 	ncons := mathutil.Min(s.ncons, 2)
 	kappend := "console=hvc0"
 	encexec, e := smlib.EncJsonGzipB64(s.exec)
@@ -49,13 +56,14 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 		msize = s.mmegs
 	}
 	fmt.Fprintln(p, "\t -m " + fmt.Sprint(msize) + "M \\")
+	fmt.Fprintln(p, "\t -pidfile " + pidfile + " \\")
 	fmt.Fprintln(p, "\t -display none -device virtio-balloon -device virtio-serial-pci \\")
 	fmt.Fprintln(p, "\t -chardev socket,id=mon,path=" + monpath + ",server,nowait \\")
 	fmt.Fprintln(p, "\t -mon chardev=mon \\")
 	fmt.Fprintln(p, "\t -chardev file,id=consdump,path=" + consdump + " \\")
 	fmt.Fprintln(p, "\t -device virtconsole,chardev=consdump \\")
 	for i := 1 ; i <= ncons ; i++ {
-		conspath := filepath.Join(j.wdir, s.name + ".vcons" + fmt.Sprint(i))
+		conspath := filepath.Join(j.wdir, rstep + ".vcons" + fmt.Sprint(i))
 		chdid := "vcons" + fmt.Sprint(i)
 		cleanafter = append(cleanafter, conspath)
 		fmt.Fprintln(p, "\t -chardev socket,id=" + chdid + ",path=" + conspath + ",server,nowait \\")

@@ -10,6 +10,7 @@ type Job struct {
 	kernel string		// which kernel to load
 	kvm string		// path to KVM
 	libmap []*Library	// toplevel libraries
+	id string		// job ID
 	steps StepMap		// job steps
 	mmegs int		// default memory for VM
 	xdisplay int		// if positive, enable guestfwd to X server with given display

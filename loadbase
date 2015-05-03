@@ -9,15 +9,15 @@ source $TOP/bldconfig
 KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
 KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
 
-$TOP/bin/fghc -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ \
-	-step loadbase$$ -host -make & # | make -f - &
+$TOP/bin/fghc -id $$ -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ \
+	-step loadbase -host -make & # | make -f - &
 
 FONT=${FONT:-terminus-18}
 
 sleep 2
 
 xterm -fn $FONT -fg lightgreen -bg black \
-	-e socat 'stdio,raw,echo=0' "unix-connect:/tmp/loadbase$$.vcons1"
+	-e socat 'stdio,raw,echo=0' "unix-connect:/tmp/$$.loadbase.vcons1"
 
-echo quit | socat stdio "unix-connect:/tmp/loadbase$$.monitor"
+echo quit | socat stdio "unix-connect:/tmp/$$.loadbase.monitor"
 

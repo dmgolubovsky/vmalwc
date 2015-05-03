@@ -6,6 +6,7 @@ TOP=`dirname $0`
 
 [ -z $4 ] && {
 	echo Usage `basename $0` from_image to_image sysin sysout
+	exit 1
 }
 
 from_image="$1"

@@ -119,6 +119,10 @@ func main () {
 				i++
 				job.kernel = pargs[i]
 				skip = true
+			case "-id":
+				i++
+				job.id = pargs[i]
+				skip = true
 			case "-kvm":
 				i++
 				job.kvm = pargs[i]
