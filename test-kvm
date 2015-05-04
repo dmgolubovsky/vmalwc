@@ -13,12 +13,12 @@ echo aaa > $HOME/.ulibtest/aaa
 KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
 KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
 
-$TOP/bin/fghc -mem 128M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ -user \
-		-step fmtvol$$ \
+$TOP/bin/fghc -mem 128M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ -user -id `basename $0-$$` \
+		-step fmtvol \
 			-lib vol0 -new 512M -rw -type qcow2 \
 			-exec 'mkfs.ext2 /dev/vda' \
-		-step xxx$$ \
-			-lib @fmtvol$$.vol0 \
+		-step xxx \
+			-lib @fmtvol.vol0 \
 			-lib here -path $TOP -type 9p -rw \
 			-lib ult -path $HOME/.ulibtest -type 9p -ro -utag .ulibtest \
 			-sysout /host/here/test-kvm.sysout \
