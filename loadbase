@@ -19,5 +19,5 @@ sleep 2
 xterm -fn $FONT -fg lightgreen -bg black \
 	-e socat 'stdio,raw,echo=0' "unix-connect:/tmp/$$.loadbase.vcons1"
 
-echo quit | socat stdio "unix-connect:/tmp/$$.loadbase.monitor"
+(echo quit | socat stdio "unix-connect:/tmp/$$.loadbase.monitor") || exit 0
 

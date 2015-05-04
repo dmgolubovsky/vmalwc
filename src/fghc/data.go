@@ -23,6 +23,11 @@ type Job struct {
 	desktop string		// path to the .desktop file that started the job - only used if -user was specified
 }
 
+type Jobinfo struct {
+	id string		// job identifier, as gotten from the first part of PID file name
+	step string		// current step name
+}
+
 type LibMapN map [int] *Library
 
 type Library struct {

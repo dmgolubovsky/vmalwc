@@ -19,21 +19,20 @@ import (
 // Minimum 2 consoles (via sockets) will be allocated, more if ncons says so.
 
 func dumpstep(p io.WriteCloser, s *Step, j *Job) {
+	rstep := j.id + "." + s.name
+	status := filepath.Join(j.wdir, rstep + ".status")
+	fmt.Fprintln(p, "\t echo 'in progress' >" + status)
 	enkvm := " `kvm-ok >/dev/null && echo -cpu host -enable-kvm`"
 	fmt.Fprintln(p, "\t" + j.kvm + enkvm + " -vga none -no-reboot \\")
 	fmt.Fprintln(p, "\t -kernel " + j.kernel + " \\")
 	msize := j.mmegs
-	rand := j.id
-	if len(rand) == 0 {
-		rand = "$$PPID"
-	}
-	rstep := rand + "." + s.name
 	pidfile := filepath.Join(j.wdir, rstep + ".pid")
 	monpath := filepath.Join(j.wdir, rstep + ".monitor")
 	consdump := filepath.Join(j.wdir, rstep + ".consdump")
 	cleanafter = append(cleanafter, monpath)
 	cleanafter = append(cleanafter, consdump)
 	cleanafter = append(cleanafter, pidfile)
+	cleanafter = append(cleanafter, status)
 	ncons := mathutil.Min(s.ncons, 2)
 	kappend := "console=hvc0"
 	encexec, e := smlib.EncJsonGzipB64(s.exec)
@@ -116,6 +115,7 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	fmt.Fprintln(p, "\t -net 'user" + red1 + red2 + red3 + "' \\")
 	fmt.Fprintln(p, "\t -net nic,model=virtio \\")
 	fmt.Fprintln(p, "\t -append '" + kappend + "'")
+	fmt.Fprintln(p, "\t echo `grep ^EXITCODE: " + consdump + " | tail -n 1 | cut -d: -f 2` >" + status)
 	fmt.Fprintln(p, "\t exit `grep ^EXITCODE: " + consdump + " | tail -n 1 | cut -d: -f 2`")
 }
 

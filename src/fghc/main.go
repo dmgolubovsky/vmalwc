@@ -99,6 +99,9 @@ func main () {
 				os.Exit(1)
 			case "":
 				break
+			case "-list":
+				listjobs()
+				os.Exit(0)
 			case "-user":
 				if job.user == nil {
 					fmt.Fprintln(os.Stderr, "Cannot obtain current user information")
@@ -285,8 +288,14 @@ func main () {
 				skip = true
 		}
 	}
+	
+// If job ID was not specified make it PID of the current shell's parent (that is make)
 
-// If app config was specified, process it.
+	if len(job.id) == 0 {
+		job.id="$$PPID"
+	}
+
+// If app config was specified, process it (stub for now).
 
 	appconfig()
 
@@ -334,6 +343,7 @@ func main () {
 // For each library that is new, dump a file creation recipe based on its type.
 
 	for _, s := range job.steps {
+		rstep := job.id + "." + s.name
 		if s.libmap != nil {
 			for _, l := range s.libmap {
 				if l.save != "" {
@@ -345,7 +355,7 @@ func main () {
 						fmt.Fprintln(os.Stderr, "new library declared as copy")
 						os.Exit(1)
 					}
-					l.path = filepath.Join(job.wdir, s.name + "." + l.name)
+					l.path = filepath.Join(job.wdir, rstep + "." + l.name)
 					dep := "create_lib_" + s.name + "_" + l.name
 					s.add_dep(dep)
 					cleanafter = append(cleanafter, l.path)
@@ -368,7 +378,7 @@ func main () {
 					continue
 				}
 				if len(l.from) > 0 {
-					l.path = filepath.Join(job.wdir, s.name + "." + l.name)
+					l.path = filepath.Join(job.wdir, rstep + "." + l.name)
 					dep := "copy_lib_" + s.name + "_" + l.name
 					s.add_dep(dep)
 					cleanafter = append(cleanafter, l.path)
