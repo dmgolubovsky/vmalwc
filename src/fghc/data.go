@@ -26,6 +26,14 @@ type Job struct {
 type Jobinfo struct {
 	id string		// job identifier, as gotten from the first part of PID file name
 	step string		// current step name
+	kvmpid int		// PID of the KVM instance
+	status string		// current status
+	volumes []Volinfo	// currently used volumes (disk images only)
+}
+
+type Volinfo struct {
+	path string		// volume path
+	voltype int		// volume type, same as library type
 }
 
 type LibMapN map [int] *Library

@@ -1,0 +1,4 @@
+#! /bin/sh
+
+socat -t 345600 stdio tcp:10.0.2.150:77
+

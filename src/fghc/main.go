@@ -124,7 +124,7 @@ func main () {
 				skip = true
 			case "-id":
 				i++
-				job.id = pargs[i]
+				job.id = strings.Replace(pargs[i], ".", "", -1)
 				skip = true
 			case "-kvm":
 				i++
@@ -184,7 +184,7 @@ func main () {
 					curlib.libtype = REF
 					stlb := strings.Split(curlib.name[1:], ".")
 					if len(stlb) == 2 {
-						curlib.refstep = stlb[0]
+						curlib.refstep = strings.Replace(stlb[0], ".", "", -1)
 					}
 				} else {
 					curlib.libtype = NOTSET
@@ -271,7 +271,7 @@ func main () {
 				curstep = &Step{}
 				job.steps[pargs[i]] = curstep
 				curstep.libmap = []*Library{}
-				curstep.name = pargs[i]
+				curstep.name = strings.Replace(pargs[i], ".", "", -1)
 				curstep.ncons = 2
 				skip = true
 			case "-exec":
@@ -283,7 +283,7 @@ func main () {
 			case "-after":
 				i++
 				if curstep != nil {
-					 curstep.add_dep("step_" + pargs[i])
+					 curstep.add_dep("step_" + strings.Replace(pargs[i], ".", "", -1))
 				}
 				skip = true
 		}

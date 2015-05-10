@@ -17,7 +17,7 @@ $TOP/bin/fghc -mem 128M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ -user -id `bas
 		-step fmtvol \
 			-lib vol0 -new 512M -rw -type qcow2 \
 			-exec 'mkfs.ext2 /dev/vda' \
-		-step xxx \
+		-step x.xx \
 			-lib @fmtvol.vol0 \
 			-lib here -path $TOP -type 9p -rw \
 			-lib ult -path $HOME/.ulibtest -type 9p -ro -utag .ulibtest \
