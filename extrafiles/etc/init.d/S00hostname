@@ -1,0 +1,16 @@
+#! /bin/sh
+#
+# Set hostname from the kernel command line
+#
+
+case "$1" in
+	start)
+		if [ ! -z "$hostname" ] ; then
+			echo $hostname >/etc/hostname
+			/bin/hostname -F /etc/hostname
+		fi
+		;;
+	*)
+		echo "Usage $0 {start}"
+		exit 1
+esac

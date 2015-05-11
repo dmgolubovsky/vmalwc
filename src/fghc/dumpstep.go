@@ -35,6 +35,9 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	cleanafter = append(cleanafter, status)
 	ncons := mathutil.Min(s.ncons, 2)
 	kappend := "console=hvc0"
+	if len(j.hostname) > 0 {
+		kappend = kappend + " hostname=" + j.hostname
+	}
 	encexec, e := smlib.EncJsonGzipB64(s.exec)
 	if e != nil {
 		fmt.Fprintln(p, os.Stderr, e)

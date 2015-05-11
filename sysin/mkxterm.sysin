@@ -14,7 +14,7 @@ apt-get -y install software-properties-common
 add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic universe multiverse"
 add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic-updates universe multiverse"
 apt-get -y update
-apt-get -y install xterm base-files xfonts-terminus bash avahi-utils strace avahi-discover libnss-mdns
+apt-get -y install xterm base-files xfonts-terminus bash avahi-utils strace avahi-discover libnss-mdns dbus-x11
 
 apt-get clean
 

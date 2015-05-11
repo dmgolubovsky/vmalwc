@@ -21,6 +21,7 @@ type Job struct {
 	uimp bool		// if true, import user home directory into the VM
 	make bool		// if true redirect output to make -f -
 	desktop string		// path to the .desktop file that started the job - only used if -user was specified
+	hostname string		// try to set all VMs of this job to the given hostname
 }
 
 type Jobinfo struct {
@@ -28,6 +29,7 @@ type Jobinfo struct {
 	step string		// current step name
 	kvmpid int		// PID of the KVM instance
 	status string		// current status
+	stalled bool		// job stalled (terminated earlier and status was not cleaned up)
 	volumes []Volinfo	// currently used volumes (disk images only)
 }
 

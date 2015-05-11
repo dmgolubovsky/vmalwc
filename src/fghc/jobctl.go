@@ -12,12 +12,43 @@ import (
 	"github.com/bu-/magic"
 )
 
+// Purge all files in the working directory related to a particular stalled job or all stalled jobs.
+// If -id was previously specified on the command line only the specified job will be purged.
+// If a job is not stalled, it cannot be purged.
+
+func purgejobs() {
+	wdir := job.wdir
+	if len(job.wdir) == 0 {
+		wdir = "."
+	}
+	jis := listjobs()
+	for i := range jis {
+		if len(job.id) != 0 && jis[i].id != job.id {
+			continue
+		}
+		if !(jis[i].stalled) {
+			continue
+		}
+		files, e := filepath.Glob (filepath.Join(wdir, jis[i].id + "." + jis[i].step + ".*"))
+		if e != nil {
+			continue
+		}
+		logger("Purging job " + jis[i].id)
+		for j := range files {
+			e = os.Remove(files[j])
+			if e != nil {
+				logger("Remove file " + files[j] + ": " + fmt.Sprint(e))
+			}
+		}
+	}
+}
+
 // Read all the files from the working directory whose names end with *.pid and obtain
 // information about running jobs. This function is called when the -list option is provided
 // on the command line, so the working directory and also desired output format should
 // be specified before.
 
-func listjobs() {
+func listjobs() []Jobinfo {
 	wdir := job.wdir
 	if len(job.wdir) == 0 {
 		wdir = "."
@@ -25,7 +56,7 @@ func listjobs() {
 	pids, e := filepath.Glob(filepath.Join(wdir, "*.pid"))
 	if e != nil {
 		fmt.Fprintln(os.Stderr, e)
-		return
+		return []Jobinfo{}
 	}
 	jis := make([]Jobinfo, len(pids))
 	for i := range pids {
@@ -42,6 +73,8 @@ func listjobs() {
 			continue
 		}
 		jis[i].kvmpid = kvmpid
+		kvmexe, e := os.Readlink(filepath.Join("/proc", fmt.Sprint(kvmpid), "exe"))
+		jis[i].stalled = !(kvmexe == job.kvm)
 		jis[i].volumes = listvolumes(kvmpid)
 		status := filepath.Join(wdir, pidsplt[0] + "." + pidsplt[1] + ".status")
 		jst, e := ioutil.ReadFile(status)
@@ -53,6 +86,7 @@ func listjobs() {
 	for i := range jis {
 		fmt.Println(jis[i])
 	}
+	return jis
 }
 
 // List volumes used by a VM. Read all symlinks from /proc/KVMPID/fd directory

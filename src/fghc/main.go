@@ -14,6 +14,9 @@ import (
 	"bitbucket.org/creachadair/goflags/bytesize"
 )
 
+func logger(s string) {
+		exec.Command("logger", s).Run()
+}
 
 func vbreak (w io.WriteCloser) {
 	fmt.Fprintln(w)
@@ -81,6 +84,7 @@ func main () {
 	job.xdisplay = -1
 	job.video = false
 	job.audio = false
+	job.hostname = "VM-" + fmt.Sprint(os.Getpid())
 	u, e := user.Current()
 	if e != nil {
 		job.user = nil
@@ -101,6 +105,9 @@ func main () {
 				break
 			case "-list":
 				listjobs()
+				os.Exit(0)
+			case "-purge":
+				purgejobs()
 				os.Exit(0)
 			case "-user":
 				if job.user == nil {
@@ -129,6 +136,10 @@ func main () {
 			case "-kvm":
 				i++
 				job.kvm = pargs[i]
+				skip = true
+			case "-hostname":
+				i++
+				job.hostname = pargs[i]
 				skip = true
 			case "-workdir":
 				i++
@@ -290,9 +301,12 @@ func main () {
 	}
 	
 // If job ID was not specified make it PID of the current shell's parent (that is make)
+// Otherwise append the PID of make after what's specified.
 
 	if len(job.id) == 0 {
-		job.id="$$PPID"
+		job.id = "$$PPID"
+	} else {
+		job.id = job.id + "-$$PPID"
 	}
 
 // If app config was specified, process it (stub for now).
@@ -319,6 +333,7 @@ func main () {
 			os.Exit(1)
 		}
 		mkpr.Stdout = os.Stdout
+		logger("Job " + job.id + " started")
 		mkpr.Start()
 		if e != nil {
 			fmt.Fprintln(os.Stderr, "cannot start make: ", e)
@@ -449,7 +464,12 @@ func main () {
 	p.Close()
 
 	if mkpr != nil {
-		mkpr.Wait()
+		e = mkpr.Wait()
+		etxt := ""
+		if e != nil {
+			etxt = fmt.Sprint(": ", e)
+		}
+		logger("Job " + job.id + " finished" + etxt)
 	}
 
 }
