@@ -139,7 +139,7 @@ func main () {
 				skip = true
 			case "-hostname":
 				i++
-				job.hostname = pargs[i]
+				job.hostname = filepath.Base(pargs[i])
 				skip = true
 			case "-workdir":
 				i++

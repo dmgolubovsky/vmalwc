@@ -34,7 +34,7 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	cleanafter = append(cleanafter, pidfile)
 	cleanafter = append(cleanafter, status)
 	ncons := mathutil.Min(s.ncons, 2)
-	kappend := "console=hvc0"
+	kappend := "console=hvc0 step=" + rstep + " jobid=" + j.id
 	if len(j.hostname) > 0 {
 		kappend = kappend + " hostname=" + j.hostname
 	}
@@ -117,7 +117,7 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	}
 	fmt.Fprintln(p, "\t -net 'user" + red1 + red2 + red3 + "' \\")
 	fmt.Fprintln(p, "\t -net nic,model=virtio \\")
-	fmt.Fprintln(p, "\t -append '" + kappend + "' ; exit `echo $$? | tee " + status + "` ) && \\")
+	fmt.Fprintln(p, "\t -append \"" + kappend + "\" ; exit `echo $$? | tee " + status + "` ) && \\")
 	fmt.Fprintln(p, "\t\t exit `grep ^EXITCODE: " + consdump + " | tail -n 1 | cut -d: -f 2 | tee " + status + "`")
 }
 
