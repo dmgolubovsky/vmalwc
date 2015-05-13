@@ -109,6 +109,12 @@ func main () {
 			case "-purge":
 				purgejobs()
 				os.Exit(0)
+			case "-stop":
+				stopjob()
+				os.Exit(0)
+			case "-kill":
+				killjob()
+				os.Exit(0)
 			case "-user":
 				if job.user == nil {
 					fmt.Fprintln(os.Stderr, "Cannot obtain current user information")

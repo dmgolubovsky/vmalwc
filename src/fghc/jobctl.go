@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"syscall"
 	"strings"
 	"strconv"
 	"io/ioutil"
@@ -39,6 +40,37 @@ func purgejobs() {
 			if e != nil {
 				logger("Remove file " + files[j] + ": " + fmt.Sprint(e))
 			}
+		}
+	}
+}
+
+// Stop a job by sending SIGINT to the KVM running it. This causes clean termination,
+// and job's temporary files will be cleaned up. Job ID should have been spceified
+// earlier in the command line.
+
+func stopjob() {
+	termjob(syscall.SIGINT)
+}
+
+// Kill a job by sending SIGKILL to the KVM running it. This causes dirty termination,
+// and job's temporary files will be preserved in the working directory. Job ID should 
+// have been spceified earlier in the command line.
+
+func killjob() {
+	termjob(syscall.SIGKILL)
+}
+
+// Common part of the stop/kill job facility.
+
+func termjob(sig syscall.Signal) {
+	if len(job.id) == 0 {
+		return
+	}
+	jis := listjobs()
+	for i := range jis {
+		if jis[i].id == job.id {
+			syscall.Kill(jis[i].kvmpid, sig)
+			return
 		}
 	}
 }
