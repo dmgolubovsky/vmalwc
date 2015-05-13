@@ -85,6 +85,7 @@ func main () {
 	job.video = false
 	job.audio = false
 	job.hostname = "VM-" + fmt.Sprint(os.Getpid())
+	prtmode := "text"
 	u, e := user.Current()
 	if e != nil {
 		job.user = nil
@@ -104,7 +105,10 @@ func main () {
 			case "":
 				break
 			case "-list":
-				listjobs()
+				lst := listjobs()
+				if len(lst) > 0 {
+					prtjobs(lst, prtmode)
+				}
 				os.Exit(0)
 			case "-purge":
 				purgejobs()

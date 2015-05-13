@@ -64,6 +64,7 @@ func killjob() {
 
 func termjob(sig syscall.Signal) {
 	if len(job.id) == 0 {
+		fmt.Println("Terminating job: no job ID specified")
 		return
 	}
 	jis := listjobs()
@@ -114,9 +115,6 @@ func listjobs() []Jobinfo {
 			continue
 		}
 		jis[i].status = string(jst)
-	}
-	for i := range jis {
-		fmt.Println(jis[i])
 	}
 	return jis
 }
