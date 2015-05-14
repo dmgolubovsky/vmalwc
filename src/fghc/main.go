@@ -144,6 +144,7 @@ func main () {
 				skip = true
 			case "-id":
 				i++
+				job.idraw = pargs[i]
 				job.id = strings.Replace(pargs[i], ".", "", -1)
 				skip = true
 			case "-kvm":

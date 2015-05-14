@@ -13,35 +13,40 @@ import (
 	"github.com/bu-/magic"
 )
 
-// Read contents of the consdump file of the given job and copy it to stdout.
+// Read contents of the consdump file of the given job and copy it to stdout. Glob patterns in job ID are allowed.
 
 func joblog(prtmode string) {
 	wdir := job.wdir
 	if len(job.wdir) == 0 {
 		wdir = "."
 	}
-	if len(job.id) == 0 {
+	if len(job.idraw) == 0 {
 		fmt.Println("Log: no job ID specified")
 		return
 	}
 	jis := listjobs()
+	c := 0
 	for i := range jis {
-		if jis[i].id == job.id {
+		if m, _ := filepath.Match(job.idraw, jis[i].id); m {
 			consdump := filepath.Join(wdir, jis[i].id + "." + jis[i].step + ".consdump")
 			f, e := os.Open(consdump)
 			if e != nil {
 				fmt.Println("Log: cannot open: ", e)
-				return
+				continue
 			}
 			prtlog(f, prtmode)
 			f.Close()
+			c++
 		}
+	}
+	if c == 0 {
+		fmt.Println("Log: no jobs matching the pattern " + job.idraw)
 	}
 }
 
 // Purge all files in the working directory related to a particular stalled job or all stalled jobs.
 // If -id was previously specified on the command line only the specified job will be purged.
-// If a job is not stalled, it cannot be purged.
+// If a job is not stalled, it cannot be purged. Glob patterns in job ID are alowed.
 
 func purgejobs() {
 	wdir := job.wdir
@@ -50,8 +55,10 @@ func purgejobs() {
 	}
 	jis := listjobs()
 	for i := range jis {
-		if len(job.id) != 0 && jis[i].id != job.id {
-			continue
+		if len(job.idraw) != 0 { 
+			if m, _ := filepath.Match(job.idraw, jis[i].id) ; !m {
+				continue
+			}
 		}
 		if !(jis[i].stalled) {
 			continue
