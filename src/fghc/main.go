@@ -113,6 +113,9 @@ func main () {
 			case "-purge":
 				purgejobs()
 				os.Exit(0)
+			case "-log":
+				joblog(prtmode)
+				os.Exit(0)
 			case "-stop":
 				stopjob()
 				os.Exit(0)

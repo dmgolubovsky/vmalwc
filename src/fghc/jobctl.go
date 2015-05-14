@@ -13,6 +13,32 @@ import (
 	"github.com/bu-/magic"
 )
 
+// Read contents of the consdump file of the given job and copy it to stdout.
+
+func joblog(prtmode string) {
+	wdir := job.wdir
+	if len(job.wdir) == 0 {
+		wdir = "."
+	}
+	if len(job.id) == 0 {
+		fmt.Println("Log: no job ID specified")
+		return
+	}
+	jis := listjobs()
+	for i := range jis {
+		if jis[i].id == job.id {
+			consdump := filepath.Join(wdir, jis[i].id + "." + jis[i].step + ".consdump")
+			f, e := os.Open(consdump)
+			if e != nil {
+				fmt.Println("Log: cannot open: ", e)
+				return
+			}
+			prtlog(f, prtmode)
+			f.Close()
+		}
+	}
+}
+
 // Purge all files in the working directory related to a particular stalled job or all stalled jobs.
 // If -id was previously specified on the command line only the specified job will be purged.
 // If a job is not stalled, it cannot be purged.

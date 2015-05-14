@@ -1,4 +1,8 @@
 #! /bin/sh
 
-socat -t 345600 stdio tcp:10.0.2.150:77
+if [ ! -z "$1" ] ; then
+	echo "$@" | socat -t 345600 stdio tcp:10.0.2.150:77
+else
+	socat -t 345600 stdio tcp:10.0.2.150:77
+fi
 
