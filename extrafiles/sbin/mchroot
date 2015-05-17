@@ -39,8 +39,8 @@ if [ -z "$user" ] || [ -z "$gid" ] || [ -z "$uid" ]  ; then
 	exec chroot $nr "$@"
 else
 	( chroot $nr addgroup --gid $gid $user || true ) &&
-	echo Y | chroot $nr adduser --uid $uid --gid $gid \
-			--home $homebase --disabled-login $user &&
+	echo Y | ( chroot $nr adduser --uid $uid --gid $gid \
+		--home $homebase --disabled-login $user || true ) &&
 	HOME=$homebase exec dbus-run-session chroot --userspec $uid:$gid $nr "$@"
 fi
 

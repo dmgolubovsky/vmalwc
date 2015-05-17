@@ -200,6 +200,7 @@ func guessvol(mgds string) int {
 		vtype int } {
 		{"QCOW", QCOW2},
 		{"ext2", RAW},
+		{"directory", NINEP},
 	}
 
 	for i := range mss {

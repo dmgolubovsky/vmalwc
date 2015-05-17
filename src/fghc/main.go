@@ -280,6 +280,8 @@ func main () {
 						default:
 							fmt.Fprintln(os.Stderr, "unknown library type: ", pargs[i])
 							os.Exit(1)
+						case "auto":
+							curlib.libtype = NOTSET
 						case "raw":
 							curlib.libtype = RAW
 						case "qcow2":

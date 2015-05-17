@@ -1,0 +1,22 @@
+#! /bin/bash
+
+# The startup script for VMALWC
+
+TOP=`dirname $0`
+
+if [ $TOP = "." ] ; then
+	TOP=`pwd`
+fi
+
+cd $TOP
+
+eval `pax11publish -i`
+
+if [ -z "$PULSE_SERVER" ] ; then
+	export PULSE_SERVER=unix:`pactl info|grep "^Server String:"|cut -d":" -f 2|tr -d ' '`
+fi
+
+subtle &
+
+./loadbase
+

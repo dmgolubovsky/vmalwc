@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 	"path/filepath"
+	"github.com/bu-/magic"
 	"github.com/cznic/mathutil"
 	"launchpad.net/zabudka/go-src/src/smlib"
 )
@@ -112,8 +113,11 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 		red2 = ",guestfwd=tcp:10.0.2.200:4713-cmd:socat stdio " + xaudio
 	}
 	if s.host {
-		fghc := os.Args[0] + " -kernel " + j.kernel + " -kvm " + j.kvm + " -mem " + fmt.Sprint(j.mmegs) + "M" + " -workdir " + j.wdir
-		red3 = ",guestfwd=tcp:10.0.2.150:77-cmd:xargs " + fghc
+		fenv := "env PULSE_SERVER=" + paudio + " PULSE_EXTERNAL_SERVER=" + xaudio + " "
+		fghc := os.Args[0] + " -kernel " + j.kernel + " -kvm " + j.kvm + 
+			" -mem " + fmt.Sprint(j.mmegs) + "M" + " -workdir " + j.wdir
+		red3 = ",guestfwd=tcp:10.0.2.150:77-cmd:xargs " + fenv + fghc
+		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
 	}
 	fmt.Fprintln(p, "\t -net 'user" + red1 + red2 + red3 + "' \\")
 	fmt.Fprintln(p, "\t -net nic,model=virtio \\")
@@ -123,6 +127,26 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 
 func prlib(p io.WriteCloser, i int, l *Library) {
 	switch(l.libtype) {
+		case NOTSET:
+			mgc, e := magic.Open(0)
+			if e != nil {
+				return
+			}
+			defer mgc.Close()
+			e = mgc.Load("/usr/share/misc/magic.mgc")
+			if e != nil {
+				return
+			}
+			mgs, e := mgc.File(l.path)
+			if e != nil {
+				return
+			}
+			vt := guessvol(mgs)
+			if vt == NOTSET {
+				return
+			}
+			l.libtype = vt
+			prlib(p, i, l)
 		case REF:
 			if l.reflib != nil {
 				prlib(p, i, l.reflib)
