@@ -8,6 +8,13 @@ if [ $TOP = "." ] ; then
 	TOP=`pwd`
 fi
 
+killall -9 pulseaudio
+pactl info >/dev/null
+
+$HOME/bin/patunnel 2>&1 >/dev/null &
+
+PTPID=$!
+
 cd $TOP
 
 eval `pax11publish -i`
@@ -20,3 +27,4 @@ subtle &
 
 ./loadbase
 
+kill -9 $PTPID
