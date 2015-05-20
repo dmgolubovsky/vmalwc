@@ -1,0 +1,18 @@
+#! /bin/sh
+
+if [ -z "$2" ] ; then
+	echo "Usage: $0 image command [args]"
+	exit 1
+fi
+
+img=$1
+
+shift
+
+fcmd=$1
+
+jobctl -mem 1G -audio -video -xdisplay $hostdisplay \
+	-step "$fcmd" -lib vol -path $img -snap -rw -user -make \
+		-exec \"mchroot\ /volumes/vda\ `echo $@ | sed 's/ /\\ /g'`\"
+
+

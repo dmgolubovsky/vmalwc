@@ -23,8 +23,14 @@ if [ -z "$PULSE_SERVER" ] ; then
 	export PULSE_SERVER=unix:`pactl info|grep "^Server String:"|cut -d":" -f 2|tr -d ' '`
 fi
 
-subtle &
+xsetroot -bg lightgray
+
+#jwm &
+
+#WMPID=$!
 
 ./loadbase
 
 kill -9 $PTPID
+#kill -9 $WMPID
+
