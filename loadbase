@@ -4,13 +4,15 @@ TOP=`dirname $0`
 
 [ $TOP = "." ] && TOP=`pwd`
 
+WDIR=$TOP/.vmalwc
+
 source $TOP/bldconfig
 
 KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
 KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
 XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
 
-$TOP/bin/fghc -id $$-loadbase -mem 256M -kernel $KERNEL -kvm  $KVM -workdir /tmp/ -video -xdisplay $XDISPLAY \
+$TOP/bin/fghc -id $$-loadbase -mem 256M -kernel $KERNEL -kvm  $KVM -workdir $WDIR -video -xdisplay $XDISPLAY \
 	-step loadbase -host -lib image -path $TOP/image -ro \
 	-make &
 
@@ -18,8 +20,8 @@ FONT=${FONT:-terminus-18}
 
 sleep 2
 
-vcons=`find /tmp -name $$-loadbase*vcons1 || exit 0`
-vmon=`find /tmp -name $$-loadbase*monitor || exit 0`
+vcons=`find $WDIR -name $$-loadbase*vcons1 || exit 0`
+vmon=`find $WDIR -name $$-loadbase*monitor || exit 0`
 
 xterm -fn $FONT -fg lightgreen -bg black -title "$$-loadbase: Console" \
 	-e socat 'stdio,raw,echo=0' "unix-connect:$vcons" && \

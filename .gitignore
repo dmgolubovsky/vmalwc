@@ -13,5 +13,6 @@ extrafiles/usr/**
 *.swp
 *.sysout
 .downloads/**
+.vmalwc/**
 extrafiles/etc/localtime
 extrafiles/etc/timezone

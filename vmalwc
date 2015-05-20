@@ -25,12 +25,9 @@ fi
 
 xsetroot -bg lightgray
 
-#jwm &
-
-#WMPID=$!
+mkdir -p .vmalwc
 
 ./loadbase
 
 kill -9 $PTPID
-#kill -9 $WMPID
 
