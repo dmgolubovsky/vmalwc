@@ -44,9 +44,25 @@ func joblog(prtmode string) {
 	}
 }
 
+// List all jobs whose ID matches the given glob pattern. Only job IDs wil be printed.
+
+func findjobs() {
+	if len(job.idraw) == 0 {
+		return
+	}
+	jis := listjobs()
+	for i := range jis {
+		if m, e := filepath.Match(job.idraw, jis[i].id) ; !m || e != nil {
+				continue
+			}
+		fmt.Println(jis[i].id)
+	}
+}
+
+
 // Purge all files in the working directory related to a particular stalled job or all stalled jobs.
 // If -id was previously specified on the command line only the specified job will be purged.
-// If a job is not stalled, it cannot be purged. Glob patterns in job ID are alowed.
+// If a job is not stalled, it cannot be purged. Glob patterns in job ID are allowed.
 
 func purgejobs() {
 	wdir := job.wdir

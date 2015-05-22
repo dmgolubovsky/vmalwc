@@ -110,6 +110,9 @@ func main () {
 					prtjobs(lst, prtmode)
 				}
 				os.Exit(0)
+			case "-find":
+				findjobs()
+				os.Exit(0)
 			case "-purge":
 				purgejobs()
 				os.Exit(0)
