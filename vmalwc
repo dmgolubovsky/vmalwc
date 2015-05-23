@@ -2,6 +2,8 @@
 
 # The startup script for VMALWC
 
+sleep 0.25
+
 TOP=`dirname $0`
 
 if [ $TOP = "." ] ; then
@@ -23,9 +25,13 @@ if [ -z "$PULSE_SERVER" ] ; then
 	export PULSE_SERVER=unix:`pactl info|grep "^Server String:"|cut -d":" -f 2|tr -d ' '`
 fi
 
-xsetroot -bg lightgray
+xsetroot -solid darkgray
 
-mkdir -p .vmalwc
+hash=`echo $TOP | cksum | cut -d' ' -f 1`
+
+export WDIR=$HOME/.vmalwc/$hash
+
+mkdir -p $WDIR
 
 ./loadbase
 

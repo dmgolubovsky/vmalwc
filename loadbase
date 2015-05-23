@@ -4,7 +4,7 @@ TOP=`dirname $0`
 
 [ $TOP = "." ] && TOP=`pwd`
 
-WDIR=$TOP/.vmalwc
+WDIR=${WDIR:-/tmp}
 
 source $TOP/bldconfig
 
@@ -14,14 +14,17 @@ XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
 
 $TOP/bin/fghc -id $$-loadbase -mem 256M -kernel $KERNEL -kvm  $KVM -workdir $WDIR -video -xdisplay $XDISPLAY \
 	-step loadbase -host -lib image -path $TOP/image -ro \
+			     -lib sysin -path $TOP/sysin -rw \
 	-make &
 
 FONT=${FONT:-terminus-18}
 
 sleep 2
 
-vcons=`find $WDIR -name $$-loadbase*vcons1 || exit 0`
-vmon=`find $WDIR -name $$-loadbase*monitor || exit 0`
+cd $WDIR
+
+vcons=`find . -name $$-loadbase*vcons1 || exit 0`
+vmon=`find . -name $$-loadbase*monitor || exit 0`
 
 xterm -fn $FONT -fg lightgreen -bg black -title "$$-loadbase: Console" \
 	-e socat 'stdio,raw,echo=0' "unix-connect:$vcons" && \

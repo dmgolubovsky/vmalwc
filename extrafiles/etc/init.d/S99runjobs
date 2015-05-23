@@ -1,0 +1,33 @@
+#! /bin/sh
+#
+# Start/stop jobs upon startup/shutdown
+#
+
+if [ ! -f /host/sysin/jobs.startup ] ; then
+	exit 0
+fi
+
+prefix="startup-${jobid}"
+
+export prefix
+
+case "$1" in
+	start)
+		set
+		echo "Starting jobs"
+		cat /host/sysin/jobs.startup | grep -v "^#" | grep -v "^ *$" | while read ; do
+			echo $REPLY
+			env prefix=$prefix sh -c "runimage $REPLY" 2>&1 >/dev/null &
+		done
+		echo "Jobs started"
+		;;
+	stop)
+		echo "Stopping jobs"
+		for j in `jobctl -id ${prefix}* -find` ; do
+			jobctl -id $j -stop
+		done
+		;;
+	*)
+		echo "Usage $0 {start|stop}"
+		exit 1
+esac

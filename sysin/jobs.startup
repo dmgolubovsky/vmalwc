@@ -1,0 +1,6 @@
+# List image path (in host terms relative to the vmalwc curent directory)
+# and program with arguments (as arguments to runimg). Lines starting
+# with hash and blank likes will be skipped.
+
+image/jwm.qcow2 jwm
+
