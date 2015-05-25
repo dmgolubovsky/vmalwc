@@ -20,8 +20,8 @@ BRURL=http://buildroot.net/downloads/buildroot-${BRVERSION}.tar.bz2
 
 # Build config for kernel
 
-KERVERSION=3.19.3
-KERURL=https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.19.3.tar.xz
+KERVERSION=4.0.4
+KERURL=https://www.kernel.org/pub/linux/kernel/v4.x/linux-$KERVERSION.tar.xz
 
 # Build config for ascii2uni
 

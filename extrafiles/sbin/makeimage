@@ -5,6 +5,10 @@ to_image="$2"
 sysin="$3"
 sysout="$4"
 
+if [ -z "$4" ] ; then
+	echo Usage `basename $0` from to sysin sysout
+fi
+
 jobctl -mem 256M  \
 	-step makeimage$$ \
 		-lib from -from $from_image -save $to_image -type qcow2 -rw \
