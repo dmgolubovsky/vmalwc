@@ -2,5 +2,10 @@
 # and program with arguments (as arguments to runimg). Lines starting
 # with hash and blank likes will be skipped.
 
-image/jwm.qcow2 jwm
+# image/jwm.qcow2 jwm
+
+image/razorqt.qcow2 openbox
+image/razorqt.qcow2 razor-desktop
+image/razorqt.qcow2 razor-panel
+
 

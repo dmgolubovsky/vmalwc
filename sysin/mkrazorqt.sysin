@@ -1,0 +1,21 @@
+
+exec 2>&1
+
+(
+cat <<EOF 
+#!/bin/sh
+exit 101
+EOF
+) > /usr/sbin/policy-rc.d
+
+chmod +x /usr/sbin/policy-rc.d
+
+apt-get -y install software-properties-common
+add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic universe multiverse"
+add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic-updates universe multiverse"
+apt-get -y update
+apt-get -y install razorqt-desktop razorqt-panel openbox obconf
+
+apt-get clean
+
+echo Done

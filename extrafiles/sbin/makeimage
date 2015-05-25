@@ -1,0 +1,16 @@
+#! /bin/sh
+
+from_image="$1"
+to_image="$2"
+sysin="$3"
+sysout="$4"
+
+jobctl -mem 256M  \
+	-step makeimage$$ \
+		-lib from -from $from_image -save $to_image -type qcow2 -rw \
+		-lib inlib -path `dirname $sysin` -type 9p -ro \
+		-lib outlib -path `dirname $sysout` -type 9p -rw \
+		-exec 'mchroot\ /volumes/vda\ bash\ /proc/self/fd/3' \
+		-sysin /host/inlib/`basename $sysin` \
+	       	-sysout /host/outlib/`basename $sysout` -make
+
