@@ -57,6 +57,17 @@ type Library struct {
 	newsize int		// if positive, the library has to be created anew even if existed - volumes only
 }
 
+// Map of library prefixes is indexed by the internal mountpoint inside the VM
+// and its members contain the corresponding host path and write permissions. When the
+// library path mapping is on, any path provided in a fghc parameter is attempted to
+// be mapped to the corresponding path on the host based on the path prefix. Posible prefixes
+// are /host or user's home base found in the job user specification.
+
+type LibPrefix map [string] struct {
+	hostpath string
+	write bool
+}
+
 type StepMap map [string] *Step
 
 type Step struct {
@@ -71,6 +82,7 @@ type Step struct {
 	deps []string		// step target dependencies
 	after []string		// wait for these steps to complete
 	host bool		// if true, it is possible to submit jobs on the host
+	lbrst bool		// if true, library restrictions will apply to the submitted jobs
 }
 
 func (s *Step) add_dep(dep string) () {

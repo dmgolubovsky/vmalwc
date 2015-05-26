@@ -11,6 +11,7 @@ import (
 	"strings"
 	"strconv"
 	"path/filepath"
+	"launchpad.net/zabudka/go-src/src/smlib"
 	"bitbucket.org/creachadair/goflags/bytesize"
 )
 
@@ -22,6 +23,8 @@ func vbreak (w io.WriteCloser) {
 	fmt.Fprintln(w)
 	fmt.Fprintln(w)
 }
+
+var pfxlib *LibPrefix = nil
 
 var job = Job {}
 
@@ -135,6 +138,13 @@ func main () {
 				i++
 				job.desktop = pargs[i]
 				skip = true
+			case "-lpfx":
+				i++
+				e := smlib.DecJsonGzipB64(pargs[i], pfxlib)
+				if e != nil {
+					fmt.Fprintln(os.Stderr, "Library prefix decode: " , e)
+				}
+				skip = true
 			case "-audio":
 				job.audio = true
 			case "-video":
@@ -191,6 +201,11 @@ func main () {
 				i++
 				if curstep != nil {
 					curstep.host = true
+				}
+			case "-lbrst":
+				i++
+				if curstep != nil {
+					curstep.lbrst = true
 				}
 			case "-xdisplay":
 				i++
