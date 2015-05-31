@@ -64,8 +64,8 @@ type Library struct {
 // are /host or user's home base found in the job user specification.
 
 type LibPrefix map [string] struct {
-	hostpath string
-	write bool
+	Hostpath string
+	Write bool
 }
 
 type StepMap map [string] *Step
@@ -83,6 +83,7 @@ type Step struct {
 	after []string		// wait for these steps to complete
 	host bool		// if true, it is possible to submit jobs on the host
 	lbrst bool		// if true, library restrictions will apply to the submitted jobs
+	libpfx *LibPrefix	// per-step lib prefix map which will be given to slave fghc
 }
 
 func (s *Step) add_dep(dep string) () {

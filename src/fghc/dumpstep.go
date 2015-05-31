@@ -116,6 +116,39 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 		fenv := "env PULSE_SERVER=" + paudio + " PULSE_EXTERNAL_SERVER=" + xaudio + " "
 		fghc := os.Args[0] + " -kernel " + j.kernel + " -kvm " + j.kvm + 
 			" -mem " + fmt.Sprint(j.mmegs) + "M" + " -workdir " + j.wdir
+		if s.lbrst && s.libpfx != nil {
+			for _, l := range(s.libmap) {
+				lhpath := ""
+				lcpath := ""
+				switch(l.libtype) {
+					default:
+						continue
+					case NINEP:
+						lhpath = l.path
+					case REF:
+						if l.reflib == nil {
+							continue
+						}
+						lhpath = l.reflib.path
+				}
+				if l.tag[0:1] == "H#" {
+					lcpath = j.user.HomeDir + l.tag[2:]
+				} else {
+					lcpath = filepath.Join("/host", l.tag)
+				}
+				(*s.libpfx)[lcpath] = struct {
+					Hostpath string
+					Write bool
+				} {
+					lhpath,
+					l.write,
+				}
+			}
+			encl, e := smlib.EncJsonGzipB64(*s.libpfx)
+			if e == nil {
+				fghc = fghc + " -lpfx " + encl
+			}
+		}
 		red3 = ",guestfwd=tcp:10.0.2.150:77-cmd:xargs " + fenv + fghc
 		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
 	}

@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"fmt"
+	"errors"
 	"os/user"
 	"os/exec"
 	"strings"
@@ -79,6 +80,23 @@ func findlib(refname string) *Library {
 	return nil
 }
 
+// Translate a given path using the lib prefix map provided.
+
+func transpath(path string, pfxl *LibPrefix) (string, bool, error) {
+	if pfxl == nil {
+		return path, false, nil
+	}
+	for k, p := range *pfxl {
+		if len(k) > len(path) {
+			continue
+		}
+		if strings.HasPrefix(path, k) {
+			npath := p.Hostpath + path[len(k):]
+			return npath, p.Write, nil
+		}
+	}
+	return path, false, errors.New("no library prefix found for " + path)
+}
 
 func main () {
 	pargs := append(os.Args[1:], "")
@@ -128,6 +146,11 @@ func main () {
 			case "-kill":
 				killjob()
 				os.Exit(0)
+			case "-showlib":
+				if pfxlib != nil {
+					prtlibs(pfxlib, prtmode)
+				}
+				os.Exit(0)
 			case "-user":
 				if job.user == nil {
 					fmt.Fprintln(os.Stderr, "Cannot obtain current user information")
@@ -140,7 +163,7 @@ func main () {
 				skip = true
 			case "-lpfx":
 				i++
-				e := smlib.DecJsonGzipB64(pargs[i], pfxlib)
+				e := smlib.DecJsonGzipB64(pargs[i], &pfxlib)
 				if e != nil {
 					fmt.Fprintln(os.Stderr, "Library prefix decode: " , e)
 				}
@@ -206,6 +229,9 @@ func main () {
 				i++
 				if curstep != nil {
 					curstep.lbrst = true
+					if curstep.libpfx == nil {
+						curstep.libpfx = &LibPrefix{}
+					}
 				}
 			case "-xdisplay":
 				i++
@@ -248,7 +274,13 @@ func main () {
 			case "-path":
 				i++
 				if curlib != nil {
-					curlib.path = pargs[i]
+					var wr bool
+					curlib.path, wr, e = transpath(pargs[i], pfxlib)
+					if e != nil {
+						fmt.Fprintln(os.Stderr, "Translate path: ", pargs[i], e)
+						os.Exit(1)
+					}
+					curlib.write = wr
 				}
 				skip = true
 			case "-save":
