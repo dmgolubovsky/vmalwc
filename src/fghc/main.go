@@ -185,6 +185,8 @@ func main () {
 				job.idraw = pargs[i]
 				job.id = strings.Replace(pargs[i], ".", "", -1)
 				skip = true
+			case "-idprt":
+				job.idprt = true
 			case "-kvm":
 				i++
 				job.kvm = pargs[i]
@@ -368,13 +370,14 @@ func main () {
 		}
 	}
 	
-// If job ID was not specified make it PID of the current shell's parent (that is make)
-// Otherwise append the PID of make after what's specified.
+// If job ID was not specified make it PID of this fghc instance.
+// Otherwise append the PID of fghc after what's specified.
 
+	mypid := fmt.Sprint(os.Getpid())
 	if len(job.id) == 0 {
-		job.id = "$$PPID"
+		job.id = mypid
 	} else {
-		job.id = job.id + "-$$PPID"
+		job.id = job.id + "-" + mypid
 	}
 
 // If app config was specified, process it (stub for now).
@@ -397,6 +400,9 @@ func main () {
 		}
 		if job.quiet {
 			mkpr.Args = append(mkpr.Args, "--quiet")
+			if job.idprt {
+				fmt.Println(job.id)
+			}
 		}
 		p, e = mkpr.StdinPipe()
 		if e != nil {

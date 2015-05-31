@@ -12,6 +12,7 @@ type Job struct {
 	libmap []*Library	// toplevel libraries
 	id string		// job ID
 	idraw string		// raw job ID as provided from the command line
+	idprt bool		// if true, print the job ID on the standard output as it is started (with -make -quiet)
 	steps StepMap		// job steps
 	mmegs int		// default memory for VM
 	xdisplay int		// if positive, enable guestfwd to X server with given display
