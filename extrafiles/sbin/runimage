@@ -14,7 +14,7 @@ fcmd=$1
 jobidx=${prefix:-job}
 
 jobctl -mem 1G -audio -video -xdisplay $hostdisplay -id $jobidx \
-	-step "$fcmd" -lib vol -path $img -snap -rw -user -make \
+	-step "$fcmd" -lib vol -path $img -snap -rw -user -make -quiet \
 		-exec \"mchroot\ /volumes/vda\ `echo $@ | sed 's/ /\\ /g'`\"
 
 

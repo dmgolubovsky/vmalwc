@@ -21,6 +21,7 @@ type Job struct {
 	user *user.User		// host user information
 	uimp bool		// if true, import user home directory into the VM
 	make bool		// if true redirect output to make -f -
+	quiet bool		// if true run make quietly
 	desktop string		// path to the .desktop file that started the job - only used if -user was specified
 	hostname string		// try to set all VMs of this job to the given hostname
 }

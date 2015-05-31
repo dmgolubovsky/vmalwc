@@ -174,6 +174,8 @@ func main () {
 				job.video = true
 			case "-make":
 				job.make = true
+			case "-quiet":
+				job.quiet = true
 			case "-kernel":
 				i++
 				job.kernel = pargs[i]
@@ -392,6 +394,9 @@ func main () {
 		if mkpr == nil {
 			fmt.Fprintln(os.Stderr, "cannot pipe to make")
 			os.Exit(1)
+		}
+		if job.quiet {
+			mkpr.Args = append(mkpr.Args, "--quiet")
 		}
 		p, e = mkpr.StdinPipe()
 		if e != nil {

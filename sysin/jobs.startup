@@ -4,8 +4,8 @@
 
 # image/jwm.qcow2 jwm
 
-image/razorqt.qcow2 openbox
-image/razorqt.qcow2 razor-desktop
-image/razorqt.qcow2 razor-panel
+/host/image/razorqt.qcow2 openbox
+/host/image/razorqt.qcow2 razor-desktop
+/host/image/razorqt.qcow2 razor-panel
 
 
