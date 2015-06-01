@@ -49,6 +49,7 @@ type Library struct {
 	path string		// host path to the library (directory or volume)
 	libtype int		// type of the library (raw, qcow, 9p, reference)
 	write bool		// writable
+	locked bool		// write mode cannot be overridden
 	id string		// id for KVM device definition
 	tag string		// tag for 9p, serial for volumes
 	save string		// if nonempty, save the volume at this path (ignored for 9p)

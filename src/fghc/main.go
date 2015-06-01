@@ -80,11 +80,16 @@ func findlib(refname string) *Library {
 	return nil
 }
 
-// Translate a given path using the lib prefix map provided.
+// Translate a given path using the lib prefix map provided. If path starts with an exclamation,
+// it is considered absolute path in the slave VM context, and is returned as is, rw is returned
+// as true.
 
 func transpath(path string, pfxl *LibPrefix) (string, bool, error) {
 	if pfxl == nil {
 		return path, false, nil
+	}
+	if path[0] == '!' {
+		return path[1:], true, nil
 	}
 	for k, p := range *pfxl {
 		if len(k) > len(path) {
@@ -215,13 +220,28 @@ func main () {
 			case "-sysin":
 				i++
 				if curstep != nil {
-					curstep.sysin = pargs[i]
+					p, _, e := transpath(pargs[i], pfxlib)
+					if e != nil {
+						fmt.Fprintln(os.Stderr, "Translate path: ", pargs[i], e)
+						os.Exit(1)
+					}
+					curstep.sysin = p
 				}
 				skip = true
 			case "-sysout":
 				i++
 				if curstep != nil {
-					curstep.sysout = pargs[i]
+					var wr bool
+					p, wr, e := transpath(pargs[i], pfxlib)
+					if e != nil {
+						fmt.Fprintln(os.Stderr, "Translate path: ", pargs[i], e)
+						os.Exit(1)
+					}
+					if !wr {
+						fmt.Fprintln(os.Stderr, "Canot write sysout to (read-only): ", pargs[i])
+						os.Exit(1)
+					}
+					curstep.sysout = p
 				}
 				skip = true
 			case "-host":
@@ -284,13 +304,25 @@ func main () {
 						fmt.Fprintln(os.Stderr, "Translate path: ", pargs[i], e)
 						os.Exit(1)
 					}
-					curlib.write = wr
+					if pfxlib != nil {
+						curlib.write = wr
+						curlib.locked = true
+					}
 				}
 				skip = true
 			case "-save":
 				i++
 				if curlib != nil {
-					curlib.save = pargs[i]
+					var wr bool
+					curlib.save, wr, e = transpath(pargs[i], pfxlib)
+					if e != nil {
+						fmt.Fprintln(os.Stderr, "Translate path: ", pargs[i], e)
+						os.Exit(1)
+					}
+					if !wr {
+						fmt.Fprintln(os.Stderr, "Canot save to (read-only): ", pargs[i])
+						os.Exit(1)
+					}
 				}
 				skip = true
 			case "-ro":
@@ -299,6 +331,10 @@ func main () {
 				}
 			case "-rw":
 				if curlib != nil {
+					if curlib.locked && !curlib.write {
+						fmt.Fprintln(os.Stderr, "Canot override write mode: ", curlib.name)
+						os.Exit(1)
+					}
 					curlib.write = true
 				}
 			case "-new":
@@ -316,12 +352,17 @@ func main () {
 			case "-from":
 				i++
 				if curlib != nil {
-					curlib.from = pargs[i]
+					curlib.from, _, e = transpath(pargs[i], pfxlib)
+					if e != nil {
+						fmt.Fprintln(os.Stderr, "Translate path: ", pargs[i], e)
+						os.Exit(1)
+					}
 				}
 				skip = true
 			case "-snap":
 				if curlib != nil {
 					curlib.snap = true
+					curlib.locked = false
 				}
 			case "-type":
 				i++

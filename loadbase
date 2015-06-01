@@ -12,9 +12,12 @@ KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
 KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
 XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
 
+mkdir -p $TOP/image $TOP/sysin $WDIR/apps
+
 $TOP/bin/fghc -id $$-loadbase -mem 256M -kernel $KERNEL -kvm  $KVM -workdir $WDIR -video -xdisplay $XDISPLAY \
 	-step loadbase -host -lbrst -lib image -path $TOP/image -ro \
 				    -lib sysin -path $TOP/sysin -rw \
+				    -lib apps  -path $WDIR/apps -rw \
 	-make &
 
 FONT=${FONT:-terminus-18}
