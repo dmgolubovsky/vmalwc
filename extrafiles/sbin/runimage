@@ -15,6 +15,7 @@ jobidx=${prefix:-job}
 
 jobctl -mem 1G -audio -video -xdisplay $hostdisplay -id $jobidx \
 	-step "$fcmd" -lib vol -path $img -snap -rw -user -make -quiet -idprt \
+		      -lib apps -path /host/apps/findapps -ro -tag apps/findapps \
 		-exec \"mchroot\ /volumes/vda\ `echo $@ | sed 's/ /\\ /g'`\"
 
 

@@ -1,0 +1,17 @@
+#! /bin/sh
+
+mkdir -p /host/apps/findapps/desktop /host/apps/findapps/icons
+
+for img in /host/image/*.qcow2 ; do
+
+	echo "Finding apps in $img"
+	mtime=`stat -c '%Y' $img` || continue
+	imgid=`echo $img | cksum | cut -d' ' -f 1`
+	jobctl -mem 64M -id finder -make -quiet -step finder-`basename $img .qcow2` \
+		-lib finder -path $img -snap -ro \
+		-lib sysin -path /host/sysin -ro \
+		-lib findapps -path /host/apps/findapps -rw -tag apps/findapps \
+		-exec "env\ IMAGE=$img\ MTIME=$mtime\ IMGID=$imgid\ /host/sysin/do_find\ /volumes/vda/usr/share" &
+	sleep 0.5
+done
+

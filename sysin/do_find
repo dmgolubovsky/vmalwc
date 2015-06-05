@@ -1,0 +1,32 @@
+#! /bin/sh
+
+# Perform search of .desktop files in the given directory and copy
+# them along with icons to the dedicated location /host/apps/findapps
+
+if [ -z "$1" ] ; then
+	exit
+fi
+
+find $1 -name '*.desktop' | while read ; do
+	if [ `grep '^Exec' $REPLY | wc -l` = 0 ] ; then
+		continue
+	fi
+	dst=/host/apps/findapps/desktop/${IMGID}.`basename $REPLY`
+	icon=""
+	icon=`grep '^Icon=' $REPLY | head -n 1`
+	iconfile=`echo $icon | cut -d'=' -f 2`
+	for icn in /volumes/vda/$iconfile `find /volumes/vda/usr/share/pixmaps/$iconfile.*` ; do
+		if [ -f $icn ] ; then
+			cp $icn /host/apps/findapps/icons
+			iconfile2=/host/apps/findapps/icons/`basename $icn`
+			break
+		fi
+	done
+	cat $REPLY | grep -v "^Icon" > $dst
+	echo "Icon=$iconfile2" >>$dst
+	echo "X-Image=$IMAGE" >> $dst
+	echo "X-MTime=$MTIME" >> $dst
+done
+
+
+
