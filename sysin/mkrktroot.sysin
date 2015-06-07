@@ -1,0 +1,41 @@
+
+exec 2>&1
+
+(
+cat <<EOF 
+#!/bin/sh
+exit 101
+EOF
+) > /usr/sbin/policy-rc.d
+
+ln -sf /proc/self/mounts /etc/mtab
+
+chmod +x /usr/sbin/policy-rc.d
+
+apt-get -y install software-properties-common
+add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic universe multiverse"
+add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ utopic-updates universe multiverse"
+apt-get -y update
+apt-get -y install wget make build-essential rsync unzip bc
+
+apt-get clean
+
+locale-gen en_US.UTF-8 ru_RU.UTF-8
+
+mkdir /src
+
+(
+	cd /src
+	wget http://buildroot.net/downloads/buildroot-2015.05.tar.gz
+	tar xzvf buildroot-2015.05.tar.gz
+	cp /host/apps/rocketdev/bldroot-config /src/buildroot-2015.05/.config
+)
+
+(
+	cd /src/buildroot-2015.05
+	make clean
+	make
+)
+
+echo Done
+

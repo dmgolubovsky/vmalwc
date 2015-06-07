@@ -2,6 +2,6 @@ if [ ! -d $a2udir ] ; then
 	mkdir -p $TOP/.downloads
 	mkdir -p $TOP/external
 	( cd $TOP/.downloads ; [ ! -f `basename $A2UURL` ] && wget $A2UURL )
-	( cd $TOP/external ; tar xjvf $TOP/.downloads/`basename $A2UURL` )
+	( cd $TOP/external ; tar xzvf $TOP/.downloads/`basename $A2UURL` )
 fi
 

@@ -16,6 +16,8 @@ jobctl -mem 256M  \
 		-lib inlib -path `dirname $sysin` -type 9p \
 		-lib outlib -path `dirname $sysout` -type 9p \
 		-exec 'mchroot\ /volumes/vda\ bash\ /proc/self/fd/3' \
-		-sysin /host/inlib/`basename $sysin` \
-	       	-sysout /host/outlib/`basename $sysout` -make
+		-sysin !/host/inlib/`basename $sysin` \
+	       	-sysout !/host/outlib/`basename $sysout` -make &
+	       	
+tail -F $sysout
 

@@ -1,0 +1,26 @@
+#! /bin/sh
+
+if [ -z "$2" ] ; then
+	echo "Usage: $0 image command [args]"
+	exit 1
+fi
+
+img=$1
+
+shift
+
+fcmd=$1
+
+jobidx=${prefix:-job}
+
+APP=${APP:-common_writable_area}
+
+mkdir -p /host/apps/$APP
+
+jobctl -mem 1G -audio -video -xdisplay $hostdisplay -id $jobidx \
+	-step "$fcmd" -lib vol -path $img -snap -rw -make -quiet -idprt \
+		      -lib $APP -path /host/apps/$APP -rw -tag apps/$APP \
+		      -lib apps -path /host/apps/findapps -ro -tag apps/findapps \
+		-exec \"mchroot\ /volumes/vda\ `echo $@ | sed 's/ /\\ /g'`\"
+
+
