@@ -9,6 +9,7 @@ src/launchpad.net/**
 image/**
 apps/**
 external/**
+coreos/**
 extrafiles/usr/**
 *~
 *.swp
