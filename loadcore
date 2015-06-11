@@ -1,0 +1,66 @@
+#! /bin/bash -ex
+
+# stolen from the original coreos run script.
+
+find_ssh_keys() {
+    if [ -S "$SSH_AUTH_SOCK" ]; then
+        ssh-add -L
+    fi
+    for default_key in ~/.ssh/id_*.pub; do
+        if [ ! -f "$default_key" ]; then
+            continue
+        fi
+        cat "$default_key"
+    done
+}
+
+write_ssh_keys() {
+    echo "#cloud-config"
+    echo "ssh_authorized_keys:"
+    sed -e 's/^/ - /'
+}
+
+CONFIG_DRIVE=$(mktemp -t -d loadcore-configdrive.XXXXXXXXXX)
+if [ $? -ne 0 ] || [ ! -d "$CONFIG_DRIVE" ]; then
+    echo "$0: mktemp -d failed!" >&2
+    exit 1
+fi
+trap "rm -rf '$CONFIG_DRIVE'" EXIT
+mkdir -p "${CONFIG_DRIVE}/openstack/latest"
+
+find_ssh_keys | write_ssh_keys > \
+   "${CONFIG_DRIVE}/openstack/latest/user_data"
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+WDIR=${WDIR:-/tmp}
+
+source $TOP/bldconfig
+
+KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
+KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
+XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
+
+mkdir -p $TOP/image $TOP/sysin $WDIR/apps
+
+$TOP/bin/fghc -id $$-loadcore -mem 256M -kvm  $KVM -workdir $WDIR -video -xdisplay $XDISPLAY \
+	-step loadcore -host -lbrst -xkernel $KERNEL -fwd 2222:22 \
+		       -lib conf -path $CONFIG_DRIVE -ro -tag config-2 \
+		       -lib core -path $TOP/coreos/coreos_production_qemu_image.img -snap -rw \
+	 -make &
+
+FONT=${FONT:-terminus-18}
+
+sleep 2
+
+cd $WDIR
+
+vcons=`find . -name $$-loadcore*vcons1 || exit 0`
+vmon=`find . -name $$-loadcore*monitor || exit 0`
+
+xterm -fn $FONT -fg lightgreen -bg black -title "$$-loadcore: Console" \
+	-e socat 'stdio,raw,echo=0' "unix-connect:$vcons" && \
+	(echo quit | socat stdio "unix-connect:$vmon")
+

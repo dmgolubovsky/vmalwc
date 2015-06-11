@@ -111,6 +111,7 @@ func main () {
 	job.video = false
 	job.audio = false
 	job.hostname = "VM-" + fmt.Sprint(os.Getpid())
+	job.kernel = ""
 	prtmode := "text"
 	u, e := user.Current()
 	if e != nil {
@@ -249,6 +250,29 @@ func main () {
 				if curstep != nil {
 					curstep.host = true
 				}
+			case "-xkernel":
+				i++
+				if curstep != nil {
+					curstep.xkernel = pargs[i]
+				}
+				skip = true
+			case "-fwd":
+				i++
+				if curstep != nil {
+					ps := strings.Split(pargs[i], ":")
+					if len(ps) != 2 {
+						fmt.Fprintln(os.Stderr, "-fwd needs two numbers, colon-separated")
+						os.Exit(1)
+					}
+					hp, e1 := strconv.ParseInt(ps[0], 10, 16)
+					gp, e2 := strconv.ParseInt(ps[1], 10, 16)
+					if e1 != nil || e2 != nil {
+						fmt.Fprintln(os.Stderr, "-fwd: cannot parse port number")
+						os.Exit(1)
+					}
+					curstep.hostfwd = append(curstep.hostfwd, HostFwd{int(hp), int(gp),})
+				}
+				skip = true
 			case "-lbrst":
 				i++
 				if curstep != nil {

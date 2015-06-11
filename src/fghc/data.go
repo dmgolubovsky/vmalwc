@@ -71,6 +71,11 @@ type LibPrefix map [string] struct {
 	Write bool
 }
 
+type HostFwd struct {
+	hport int		// host port to listen at
+	gport int		// guest port to forward to
+}
+
 type StepMap map [string] *Step
 
 type Step struct {
@@ -85,8 +90,11 @@ type Step struct {
 	deps []string		// step target dependencies
 	after []string		// wait for these steps to complete
 	host bool		// if true, it is possible to submit jobs on the host
+	xkernel string		// may be set for steps that load kernel-containing images, but
+				// allow host job submissions with the base kernel
 	lbrst bool		// if true, library restrictions will apply to the submitted jobs
 	libpfx *LibPrefix	// per-step lib prefix map which will be given to slave fghc
+	hostfwd []HostFwd	// per-step host forward table
 }
 
 func (s *Step) add_dep(dep string) () {

@@ -20,12 +20,15 @@ import (
 // Minimum 2 consoles (via sockets) will be allocated, more if ncons says so.
 
 func dumpstep(p io.WriteCloser, s *Step, j *Job) {
+	havekernel := (len(job.kernel) != 0)
 	rstep := j.id + "." + s.name
 	status := filepath.Join(j.wdir, rstep + ".status")
 	fmt.Fprintln(p, "\t echo 'in progress' >" + status)
 	enkvm := " `kvm-ok >/dev/null && echo -cpu host -enable-kvm`"
 	fmt.Fprintln(p, "\t(" + j.kvm + enkvm + " -vga none -no-reboot \\")
-	fmt.Fprintln(p, "\t -kernel " + j.kernel + " \\")
+	if havekernel {
+		fmt.Fprintln(p, "\t -kernel " + j.kernel + " \\")
+	}
 	msize := j.mmegs
 	pidfile := filepath.Join(j.wdir, rstep + ".pid")
 	monpath := filepath.Join(j.wdir, rstep + ".monitor")
@@ -114,7 +117,13 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	}
 	if s.host {
 		fenv := "env PULSE_SERVER=" + paudio + " PULSE_EXTERNAL_SERVER=" + xaudio + " "
-		fghc := os.Args[0] + " -kernel " + j.kernel + " -kvm " + j.kvm + 
+		krnl := ""
+		if havekernel {
+			krnl = " -kernel " + j.kernel
+		} else if len(s.xkernel) != 0 {
+			krnl = " -kernel " + s.xkernel
+		}
+		fghc := os.Args[0] +  krnl + " -kvm " + j.kvm + 
 			" -mem " + fmt.Sprint(j.mmegs) + "M" + " -workdir " + j.wdir
 		if s.lbrst && s.libpfx != nil {
 			for _, l := range(s.libmap) {
@@ -152,9 +161,19 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 		red3 = ",guestfwd=tcp:10.0.2.150:77-cmd:xargs " + fenv + fghc
 		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
 	}
-	fmt.Fprintln(p, "\t -net 'user" + red1 + red2 + red3 + "' \\")
+	red4 := ""
+	for _, p := range s.hostfwd {
+		red4 = red4 + ",hostfwd=tcp:127.0.0.1:" + fmt.Sprint(p.hport) + "-:" + fmt.Sprint(p.gport)
+	}
+	fmt.Fprintln(p, "\t -net 'user" + red1 + red2 + red3 + red4 + "' \\")
 	fmt.Fprintln(p, "\t -net nic,model=virtio \\")
-	fmt.Fprintln(p, "\t -append \"" + kappend + "\" ; exit `echo $$? | tee " + status + "` ) && \\")
+	apnd := ""
+	if havekernel {
+		apnd = "\t -append \"" + kappend + "\""
+	} else {
+		apnd = "\t -boot c "
+	}
+	fmt.Fprintln(p, apnd + " ; exit `echo $$? | tee " + status + "` ) && \\")
 	fmt.Fprintln(p, "\t\t exit `grep ^EXITCODE: " + consdump + " | tail -n 1 | cut -d: -f 2 | tee " + status + "`")
 }
 

@@ -33,6 +33,10 @@ export WDIR=$HOME/.vmalwc/$hash
 
 mkdir -p $WDIR
 
+for p in $(cat $WDIR/*.pid) ; do
+	kill $p
+done
+
 ./loadbase
 
 kill -9 $PTPID
