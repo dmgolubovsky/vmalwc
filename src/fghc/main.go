@@ -176,8 +176,11 @@ func main () {
 				skip = true
 			case "-audio":
 				job.audio = true
+				job.pulseaddr = "tcp:10.0.2.200:4713"
 			case "-video":
 				job.video = true
+				job.xservaddr = "tcp:10.0.2.100:6000"
+				job.xservdsp = "10.0.2.100:0"
 			case "-make":
 				job.make = true
 			case "-quiet":
@@ -254,6 +257,12 @@ func main () {
 				i++
 				if curstep != nil {
 					curstep.xkernel = pargs[i]
+				}
+				skip = true
+			case "-info":
+				i++
+				if curstep != nil {
+					curstep.infopath = pargs[i]
 				}
 				skip = true
 			case "-fwd":
@@ -419,6 +428,8 @@ func main () {
 				curstep.libmap = []*Library{}
 				curstep.name = strings.Replace(pargs[i], ".", "", -1)
 				curstep.ncons = 2
+				curstep.hje = "tcp:10.0.2.150:77"
+				curstep.infopath = "/dev/null"
 				skip = true
 			case "-exec":
 				i++

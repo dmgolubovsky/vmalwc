@@ -1,3 +1,4 @@
+
 // The command utility for VM job control
 
 package main
@@ -38,13 +39,19 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	cleanafter = append(cleanafter, pidfile)
 	cleanafter = append(cleanafter, status)
 	ncons := mathutil.Min(s.ncons, 2)
+	info, e := os.Create(s.infopath)
+	if e != nil {
+		fmt.Fprintln(os.Stderr, "cannot open/create the info file: ", e)
+		os.Exit(1)
+	}
+	defer info.Close()
 	kappend := "console=hvc0 step=" + rstep + " jobid=" + j.id
 	if len(j.hostname) > 0 {
 		kappend = kappend + " hostname=" + j.hostname
 	}
 	encexec, e := smlib.EncJsonGzipB64(s.exec)
 	if e != nil {
-		fmt.Fprintln(p, os.Stderr, e)
+		fmt.Fprintln(os.Stderr, e)
 		os.Exit(1)
 	}
 	if len(s.exec) > 0 {
@@ -86,21 +93,27 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 			usrname = "host_user"
 		}
 		kappend = kappend + " user=" + usrname
+		fmt.Fprintln(info, "user=" + usrname)
 		kappend = kappend + " uid=" + j.user.Uid
+		fmt.Fprintln(info, "uid=" + j.user.Uid)
 		kappend = kappend + " gid=" + j.user.Gid
+		fmt.Fprintln(info, "gid=" + j.user.Gid)
 		kappend = kappend + " homebase=" + j.user.HomeDir
+		fmt.Fprintln(info, "homebase=" + j.user.HomeDir)
 	}
 	red1 := ""
 	red2 := ""
 	red3 := ""
 	if j.video && (j.xdisplay >= 0) {
-		red1 = ",guestfwd=tcp:10.0.2.100:6000-cmd:socat stdio unix-connect:/tmp/.X11-unix/X" + fmt.Sprint(j.xdisplay)
-		kappend = kappend + " display=10.0.2.100:0"
+		red1 = ",guestfwd=" + j.xservaddr + "-cmd:socat stdio unix-connect:/tmp/.X11-unix/X" + fmt.Sprint(j.xdisplay)
+		kappend = kappend + " display=" + j.xservdsp
+		fmt.Fprintln(info, "display=" + j.xservdsp)
 	}
 	paudio := os.Getenv("PULSE_SERVER")
 	xaudio := os.Getenv("PULSE_EXTERNAL_SERVER")
 	if j.audio && (len(paudio) > 0) {
-		kappend = kappend + " pulse=tcp:10.0.2.200:4713"
+		kappend = kappend + " pulse=" + j.pulseaddr
+		fmt.Fprintln(info, "pulse=" + j.pulseaddr)
 		papts := strings.Split(paudio, "}")
 		pasrv := ""
 		if len(papts) == 2 {
@@ -110,10 +123,11 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 			pasrv = paudio
 	
 		}
-		red2 = ",guestfwd=tcp:10.0.2.200:4713-cmd:socat stdio " + pasrv
+		red2 = ",guestfwd=" + j.pulseaddr + "-cmd:socat stdio " + pasrv
 	} else if j.audio && (len(xaudio) > 0) {
-		kappend = kappend + " pulse=tcp:10.0.2.200:4713"
-		red2 = ",guestfwd=tcp:10.0.2.200:4713-cmd:socat stdio " + xaudio
+		kappend = kappend + " pulse=" + j.pulseaddr
+		fmt.Fprintln(info, "pulse=" + j.pulseaddr)
+		red2 = ",guestfwd=" + j.pulseaddr + "-cmd:socat stdio " + xaudio
 	}
 	if s.host {
 		fenv := "env PULSE_SERVER=" + paudio + " PULSE_EXTERNAL_SERVER=" + xaudio + " "
@@ -158,8 +172,9 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 				fghc = fghc + " -lpfx " + encl
 			}
 		}
-		red3 = ",guestfwd=tcp:10.0.2.150:77-cmd:xargs " + fenv + fghc
+		red3 = ",guestfwd=" + s.hje + "-cmd:xargs " + fenv + fghc
 		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
+		fmt.Fprintln(info, "hostdisplay=" + fmt.Sprint(j.xdisplay))
 	}
 	red4 := ""
 	for _, p := range s.hostfwd {

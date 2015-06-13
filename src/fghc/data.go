@@ -17,7 +17,10 @@ type Job struct {
 	mmegs int		// default memory for VM
 	xdisplay int		// if positive, enable guestfwd to X server with given display
 	video bool		// if true, video access (X display) is allowed
+	xservaddr string	// internal (tcp) address of the forwarded host X server
+	xservdsp string		// internal X display to connect to
 	audio bool		// if true, audio access (pulseaudio forwarding) is allowed
+	pulseaddr string	// internal (tcp) address of the forwarded host pulseaudio
 	wdir string		// working directory of the job
 	user *user.User		// host user information
 	uimp bool		// if true, import user home directory into the VM
@@ -90,11 +93,15 @@ type Step struct {
 	deps []string		// step target dependencies
 	after []string		// wait for these steps to complete
 	host bool		// if true, it is possible to submit jobs on the host
+	hje string		// address string (tcp) for host job entry
 	xkernel string		// may be set for steps that load kernel-containing images, but
 				// allow host job submissions with the base kernel
 	lbrst bool		// if true, library restrictions will apply to the submitted jobs
 	libpfx *LibPrefix	// per-step lib prefix map which will be given to slave fghc
 	hostfwd []HostFwd	// per-step host forward table
+	infopath string		// path where information file should be placed, usable with
+				// images with internal kernel; some kappends will be placed
+				// into that file one per line
 }
 
 func (s *Step) add_dep(dep string) () {
