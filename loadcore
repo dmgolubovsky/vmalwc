@@ -43,26 +43,44 @@ KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
 KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
 XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
 
+COREDIR=$TOP/external/coreos
+
+if [ -r $COREDIR/coreos_production_qemu.sh ] ; then
+	name=$(grep "^VM_NAME" $COREDIR/coreos_production_qemu.sh | head -n 1 | cut -d"=" -f 2 | tr -d \'\")
+fi
+
+name=${name:-loadcore}
+
+
+eval `pax11publish -i`
+
+if [ -z "$PULSE_SERVER" ] ; then
+        export PULSE_SERVER=unix:`pactl info|grep "^Server String:"|cut -d":" -f 2|tr -d ' '`
+fi
+
+
 mkdir -p $TOP/image $TOP/sysin $WDIR/apps
 
 $TOP/bin/fghc -id $$-loadcore -mem 256M -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
+	-hostname $name \
 	-step loadcore -host -lbrst -xkernel $KERNEL -fwd 2222:22 -info $CONFIG_DRIVE/user_info \
 		       -lib conf -path $CONFIG_DRIVE -ro -tag config-2 \
-		       -lib core -path $TOP/coreos/coreos_production_qemu_image.img -snap -rw \
+		       -lib core -path $COREDIR/coreos_production_qemu_image.img -snap -rw \
 	-make &
 
 
 
 FONT=${FONT:-terminus-18}
 
-sleep 2
+ssh-keyscan -v -p 2222 -T 20 -t dsa,ecdsa,ed25519 localhost
+
+sleep 1
 
 cd $WDIR
 
-vcons=`find . -name $$-loadcore*vcons1 || exit 0`
-vmon=`find . -name $$-loadcore*monitor || exit 0`
+vmon=`find . -name "$$-loadcore*.monitor" || exit 0`
 
-xterm -fn $FONT -geometry 100x40 -fg lightgreen -bg black -title "$$-loadcore: Console" \
-	-e ssh -l core -p 2222 localhost && \
+xterm -fn $FONT -fg lightgreen -bg black -title "$name: Console [$$]" -fullscreen \
+	-e ssh -q -o StrictHostKeyChecking=no -l core -p 2222 localhost && \
 	(echo quit | socat stdio "unix-connect:$vmon")
 

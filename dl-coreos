@@ -1,0 +1,22 @@
+#! /bin/bash -ex
+
+# Download the lates production image of CoreOS
+
+TOP=`dirname $0`
+
+[ $TOP = "." ] && TOP=`pwd`
+
+source $TOP/bldconfig
+
+mkdir -p $TOP/external/coreos
+
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R [localhost]:2222
+
+(
+	cd $TOP/external/coreos
+	wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_qemu.sh
+	wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_qemu_image.img.bz2 -O - \
+	       	| bzcat > coreos_production_qemu_image.img
+)
+
+

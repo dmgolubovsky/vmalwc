@@ -26,7 +26,7 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	status := filepath.Join(j.wdir, rstep + ".status")
 	fmt.Fprintln(p, "\t echo 'in progress' >" + status)
 	enkvm := " `kvm-ok >/dev/null && echo -cpu host -enable-kvm`"
-	fmt.Fprintln(p, "\t(" + j.kvm + enkvm + " -vga none -no-reboot \\")
+	fmt.Fprintln(p, "\t(" + j.kvm + enkvm + " -vga none -no-reboot -name " + s.name + " \\")
 	if havekernel {
 		fmt.Fprintln(p, "\t -kernel " + j.kernel + " \\")
 	}
@@ -173,6 +173,7 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 			}
 		}
 		red3 = ",guestfwd=" + s.hje + "-cmd:xargs " + fenv + fghc
+		fmt.Fprintln(info, "hje=" + s.hje)
 		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
 		fmt.Fprintln(info, "hostdisplay=" + fmt.Sprint(j.xdisplay))
 	}
@@ -180,7 +181,11 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	for _, p := range s.hostfwd {
 		red4 = red4 + ",hostfwd=tcp:127.0.0.1:" + fmt.Sprint(p.hport) + "-:" + fmt.Sprint(p.gport)
 	}
-	fmt.Fprintln(p, "\t -net 'user" + red1 + red2 + red3 + red4 + "' \\")
+	red0 := ""
+	if len(j.hostname) > 0 {
+		red0 = ",hostname=" + j.hostname
+	}
+	fmt.Fprintln(p, "\t -net 'user" + red0 + red1 + red2 + red3 + red4 + "' \\")
 	fmt.Fprintln(p, "\t -net nic,model=virtio \\")
 	apnd := ""
 	if havekernel {
