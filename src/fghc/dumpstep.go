@@ -107,13 +107,13 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	if j.video && (j.xdisplay >= 0) {
 		red1 = ",guestfwd=" + j.xservaddr + "-cmd:socat stdio unix-connect:/tmp/.X11-unix/X" + fmt.Sprint(j.xdisplay)
 		kappend = kappend + " display=" + j.xservdsp
-		fmt.Fprintln(info, "display=" + j.xservdsp)
+		fmt.Fprintln(info, "DISPLAY=" + j.xservdsp)
 	}
 	paudio := os.Getenv("PULSE_SERVER")
 	xaudio := os.Getenv("PULSE_EXTERNAL_SERVER")
 	if j.audio && (len(paudio) > 0) {
 		kappend = kappend + " pulse=" + j.pulseaddr
-		fmt.Fprintln(info, "pulse=" + j.pulseaddr)
+		fmt.Fprintln(info, "PULSE_SERVER=" + j.pulseaddr)
 		papts := strings.Split(paudio, "}")
 		pasrv := ""
 		if len(papts) == 2 {
@@ -173,7 +173,7 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 			}
 		}
 		red3 = ",guestfwd=" + s.hje + "-cmd:xargs " + fenv + fghc
-		fmt.Fprintln(info, "hje=" + s.hje)
+		fmt.Fprintln(info, "HOST_JOB_ENTRY=" + s.hje)
 		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
 		fmt.Fprintln(info, "hostdisplay=" + fmt.Sprint(j.xdisplay))
 	}
