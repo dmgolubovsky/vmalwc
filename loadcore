@@ -31,6 +31,8 @@ mkdir -p "${CONFIG_DRIVE}/openstack/latest"
 find_ssh_keys | write_ssh_keys > \
    "${CONFIG_DRIVE}/openstack/latest/user_data"
 
+cp -H /etc/localtime "${CONFIG_DRIVE}/host-localtime"
+
 TOP=`dirname $0`
 
 [ $TOP = "." ] && TOP=`pwd`
@@ -58,14 +60,41 @@ if [ -z "$PULSE_SERVER" ] ; then
         export PULSE_SERVER=unix:`pactl info|grep "^Server String:"|cut -d":" -f 2|tr -d ' '`
 fi
 
+IMGSTOR="$WDIR/imagestore"
 
-mkdir -p $TOP/image $TOP/sysin $WDIR/apps
+if [ ! -f $IMGSTOR ] ; then
+	df=`df --output=avail $WDIR | tail -n 1`
+	imsz=$(($df/4))
+	fallocate -l ${imsz}K $IMGSTOR
+	mkfs.btrfs $IMGSTOR
+fi
 
-$TOP/bin/fghc -id $$-loadcore -mem 256M -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
+( 
+cat <<EOF
+coreos:
+  units:
+    - name: copy-host-timezone.service
+      command: start
+      content: |
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/cp /media/configvirtfs/host-localtime /etc/localtime
+    - name: var-lib-machines.mount
+      command: start
+      content: |
+        [Mount]
+        What=/dev/vdb
+        Where=/var/lib/machines
+        Type=btrfs
+EOF
+) >> $CONFIG_DRIVE/openstack/latest/user_data
+
+$TOP/bin/fghc -id $$-loadcore -mem 1G -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
 	-hostname $name \
 	-step loadcore -host -lbrst -xkernel $KERNEL -fwd 2222:22 -info $CONFIG_DRIVE/user_info \
 		       -lib conf -path $CONFIG_DRIVE -ro -tag config-2 \
 		       -lib core -path $COREDIR/coreos_production_qemu_image.img -snap -rw \
+		       -lib imgstor -path $IMGSTOR -rw \
 	-make &
 
 

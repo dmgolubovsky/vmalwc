@@ -265,6 +265,12 @@ func main () {
 					curstep.infopath = pargs[i]
 				}
 				skip = true
+			case "-copy":
+				i++
+				if curstep != nil {
+					curstep.copyfiles = append(curstep.copyfiles, pargs[i])
+				}
+				skip = true
 			case "-fwd":
 				i++
 				if curstep != nil {

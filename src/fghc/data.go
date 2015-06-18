@@ -102,6 +102,7 @@ type Step struct {
 	infopath string		// path where information file should be placed, usable with
 				// images with internal kernel; some kappends will be placed
 				// into that file one per line
+	copyfiles []string	// copy named files to the infopath area, skip if file does not exist
 }
 
 func (s *Step) add_dep(dep string) () {

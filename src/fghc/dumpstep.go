@@ -14,6 +14,25 @@ import (
 	"launchpad.net/zabudka/go-src/src/smlib"
 )
 
+// Copy one file to another, ignore errors, copied from http://golang.org/doc/progs/defer2.go
+
+
+func CopyFile(dstName, srcName string) (written int64, err error) {
+    src, err := os.Open(srcName)
+    if err != nil {
+        return
+    }
+    defer src.Close()
+ 
+    dst, err := os.Create(dstName)
+    if err != nil {
+        return
+    }
+    defer dst.Close()
+ 
+    return io.Copy(dst, src)
+}
+
 // Invoke KVM with all necessary options.
 // All files that a VM instance creates will be added to the clean after list.
 // All files will be created under the job's working directory prepending step name.
@@ -176,6 +195,12 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 		fmt.Fprintln(info, "HOST_JOB_ENTRY=" + s.hje)
 		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
 		fmt.Fprintln(info, "hostdisplay=" + fmt.Sprint(j.xdisplay))
+		if s.infopath != "/dev/null" {
+			for _, f := range(s.copyfiles) {
+				dir := filepath.Dir(s.infopath)
+				CopyFile(filepath.Join(dir, filepath.Base(f)), f)
+			}
+		}
 	}
 	red4 := ""
 	for _, p := range s.hostfwd {

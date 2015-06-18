@@ -216,6 +216,7 @@ func guessvol(mgds string) int {
 		vtype int } {
 		{"QCOW", QCOW2},
 		{"ext2", RAW},
+		{"BTRFS", RAW},
 		{"directory", NINEP},
 	}
 
