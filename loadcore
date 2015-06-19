@@ -28,8 +28,8 @@ fi
 trap "rm -rf '$CONFIG_DRIVE'" EXIT
 mkdir -p "${CONFIG_DRIVE}/openstack/latest"
 
-find_ssh_keys | write_ssh_keys > \
-   "${CONFIG_DRIVE}/openstack/latest/user_data"
+#find_ssh_keys | write_ssh_keys > \
+#   "${CONFIG_DRIVE}/openstack/latest/user_data"
 
 cp -H /etc/localtime "${CONFIG_DRIVE}/host-localtime"
 
@@ -69,8 +69,22 @@ if [ ! -f $IMGSTOR ] ; then
 	mkfs.btrfs $IMGSTOR
 fi
 
+sshkey=$(find_ssh_keys)
+
 ( 
 cat <<EOF
+#cloud-config
+users:
+  - name: $USER
+    groups:
+      - wheel
+      - docker
+      - systemd-journal
+      - portage
+      - core
+      - sudo
+    ssh-authorized-keys:
+      - $sshkey
 coreos:
   units:
     - name: copy-host-timezone.service
@@ -79,6 +93,12 @@ coreos:
         [Service]
         Type=oneshot
         ExecStart=/bin/cp /media/configvirtfs/host-localtime /etc/localtime
+    - name: remove-default-user.service
+      command: start
+      content: |
+        [Service]
+        Type=oneshot
+        ExecStart=/sbin/userdel core
     - name: var-lib-machines.mount
       command: start
       content: |
@@ -110,6 +130,6 @@ cd $WDIR
 vmon=`find . -name "$$-loadcore*.monitor" || exit 0`
 
 xterm -fn $FONT -fg lightgreen -bg black -title "$name: Console [$$]" -fullscreen \
-	-e ssh -q -o StrictHostKeyChecking=no -l core -p 2222 localhost && \
+	-e ssh -q -o StrictHostKeyChecking=no -p 2222 localhost && \
 	(echo quit | socat stdio "unix-connect:$vmon")
 

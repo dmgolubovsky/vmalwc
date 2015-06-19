@@ -195,6 +195,8 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 		fmt.Fprintln(info, "HOST_JOB_ENTRY=" + s.hje)
 		kappend = kappend + " hostdisplay=" + fmt.Sprint(j.xdisplay)
 		fmt.Fprintln(info, "hostdisplay=" + fmt.Sprint(j.xdisplay))
+		kappend = kappend + " hostworkdir=" + fmt.Sprint(j.wdir)
+		fmt.Fprintln(info, "hostworkdir=" + fmt.Sprint(j.wdir))
 		if s.infopath != "/dev/null" {
 			for _, f := range(s.copyfiles) {
 				dir := filepath.Dir(s.infopath)
