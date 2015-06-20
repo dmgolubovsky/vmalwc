@@ -28,8 +28,7 @@ fi
 trap "rm -rf '$CONFIG_DRIVE'" EXIT
 mkdir -p "${CONFIG_DRIVE}/openstack/latest"
 
-#find_ssh_keys | write_ssh_keys > \
-#   "${CONFIG_DRIVE}/openstack/latest/user_data"
+# Copy the host local time file to the config drive
 
 cp -H /etc/localtime "${CONFIG_DRIVE}/host-localtime"
 
@@ -45,6 +44,8 @@ KERNEL=${KERNEL:-$TOP/external/linux-$KERVERSION/arch/x86_64/boot/bzImage}
 KVM=${KVM:-$TOP/external/qemu-$QEMUVERSION/x86_64-softmmu/qemu-system-x86_64}
 XDISPLAY=`echo $DISPLAY | tr -d ':' | cut -d. -f 1`
 
+# Obtain the coreos version number for shell prompt from the cromeos' own load script
+
 COREDIR=$TOP/external/coreos
 
 if [ -r $COREDIR/coreos_production_qemu.sh ] ; then
@@ -53,12 +54,15 @@ fi
 
 name=${name:-loadcore}
 
+# Find the pulseaudio server listening address if any
 
 eval `pax11publish -i`
 
 if [ -z "$PULSE_SERVER" ] ; then
         export PULSE_SERVER=unix:`pactl info|grep "^Server String:"|cut -d":" -f 2|tr -d ' '`
 fi
+
+# If does not exist, create a btrfs volume of 1/4 space available for the work area path
 
 IMGSTOR="$WDIR/imagestore"
 
@@ -69,7 +73,12 @@ if [ ! -f $IMGSTOR ] ; then
 	mkfs.btrfs $IMGSTOR
 fi
 
+# Extract the SSH public key for the current user
+
 sshkey=$(find_ssh_keys)
+
+# Create an user for coreos with the same name as the current user, enable public key login.
+# Add a number of systemd units to run at start.
 
 ( 
 cat <<EOF
@@ -108,6 +117,26 @@ coreos:
         Type=btrfs
 EOF
 ) >> $CONFIG_DRIVE/openstack/latest/user_data
+
+# For any file specified on the command line, treat it as a systemd unit and try
+# to add to the cloud config file. Use the X-command line to form the command parameter.
+
+(
+	for s in "$@" ; do
+		if [ ! -r $s ] ; then
+			continue
+		fi
+		ucmd=$(grep "X-command=" $s | cut -d= -f 2)
+		indent="    "
+		echo "${indent}- name: $(basename $s)"
+		if [ ! -z "$ucmd" ] ; then
+			echo "${indent}  command: $ucmd"
+		fi
+		echo "${indent}  content: |"
+		cat $s | sed "s/^/${indent}    /g"
+done
+) >> $CONFIG_DRIVE/openstack/latest/user_data
+
 
 $TOP/bin/fghc -id $$-loadcore -mem 1G -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
 	-hostname $name \

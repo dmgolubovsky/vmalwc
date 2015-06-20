@@ -9,6 +9,7 @@ src/launchpad.net/**
 image/**
 apps/**
 external/**
+units/**
 coreos/**
 extrafiles/usr/**
 *~
