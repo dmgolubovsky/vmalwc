@@ -77,6 +77,13 @@ fi
 
 sshkey=$(find_ssh_keys)
 
+# Copy current user information to the coreos environment.
+
+(
+	echo USER=$USER
+	echo HOME=$HOME
+) > $CONFIG_DRIVE/user_environment
+
 # Create an user for coreos with the same name as the current user, enable public key login.
 # Add a number of systemd units to run at start.
 
@@ -85,6 +92,7 @@ cat <<EOF
 #cloud-config
 users:
   - name: $USER
+    homedir: $HOME
     groups:
       - wheel
       - docker
@@ -96,12 +104,17 @@ users:
       - $sshkey
 coreos:
   units:
-    - name: copy-host-timezone.service
+    - name: copy-host-files.service
       command: start
       content: |
         [Service]
         Type=oneshot
-        ExecStart=/bin/cp /media/configvirtfs/host-localtime /etc/localtime
+        ExecStartPre=/bin/cp /media/configvirtfs/host-localtime /etc/localtime
+        ExecStartPre=/bin/mkdir -p /etc/vmalwc/
+        ExecStartPre=/bin/cp /media/configvirtfs/user_info /etc/vmalwc/environment
+        ExecStartPre=/bin/cp /media/configvirtfs/user_environment /etc/vmalwc/user_environment
+        ExecStartPre=/bin/sh -c "echo NUID=`id -u $USER` >> /etc/vmalwc/user_environment"
+        ExecStart=/bin/true
     - name: remove-default-user.service
       command: start
       content: |
@@ -119,14 +132,14 @@ EOF
 ) >> $CONFIG_DRIVE/openstack/latest/user_data
 
 # For any file specified on the command line, treat it as a systemd unit and try
-# to add to the cloud config file. Use the X-command line to form the command parameter.
+# to add to the cloud config file. Use the X-cloud-config-command line to form the command parameter.
 
 (
 	for s in "$@" ; do
 		if [ ! -r $s ] ; then
 			continue
 		fi
-		ucmd=$(grep "X-command=" $s | cut -d= -f 2)
+		ucmd=$(grep "X-cloud-config-command=" $s | cut -d= -f 2)
 		indent="    "
 		echo "${indent}- name: $(basename $s)"
 		if [ ! -z "$ucmd" ] ; then

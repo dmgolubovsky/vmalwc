@@ -1,0 +1,24 @@
+# An instantiated service file to start an application in a container
+
+# Instance structure: containername
+
+[Service]
+
+Type=simple
+EnvironmentFile=-/etc/vmalwc/environment
+EnvironmentFile=-/etc/vmalwc/user_environment
+StandardOutput=journal
+StandardError=journal
+ExecStartPre=/bin/mount -t proc proc /var/lib/machines/%i/proc
+ExecStartPre=/bin/mount --bind /dev /var/lib/machines/%i/dev
+ExecStartPre=/bin/mount -t tmpfs tmpfs /var/lib/machines/%i/dev/shm
+ExecStartPre=/bin/sh -c "/bin/mkdir -p /var/lib/machines/%i/$HOME"
+ExecStartPre=/bin/sh -c "/bin/mount --bind $HOME /var/lib/machines/%i/$HOME"
+ExecStartPre=/usr/bin/touch /var/lib/machines/%i/etc/resolv.conf
+ExecStartPre=/bin/mount --bind /etc/resolv.conf /var/lib/machines/%i/etc/resolv.conf
+ExecStart=/bin/sh -c "/bin/chroot --userspec=$NUID:$NUID /var/lib/machines/%i /apcinit"
+ExecStopPost=/bin/umount /var/lib/machines/%i/etc/resolv.conf
+ExecStopPost=/bin/sh -c "/bin/umount /var/lib/machines/%i/$HOME"
+ExecStopPost=/bin/umount /var/lib/machines/%i/proc
+ExecStopPost=/bin/umount /var/lib/machines/%i/dev/shm
+ExecStopPost=/bin/umount /var/lib/machines/%i/dev
