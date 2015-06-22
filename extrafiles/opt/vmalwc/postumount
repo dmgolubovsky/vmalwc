@@ -1,0 +1,26 @@
+#! /bin/bash -ex
+
+# This script is to be invoked by apcon@.service after the application stops.
+# The only parameter accepted is instance (unescaped). The script should unmount all
+# previously mounted filesystems inside the container.
+# The instance name is expected in the format "container/executable/path arg arg arg".
+# Only the first element before the first slash is of interest.
+
+([ -z "$1" ] || [ -z "$HOME" ] || [ -z "$USER" ]) && {
+	echo "No instance or home directory or username provided"
+	exit 1
+}
+
+cont=$(echo "$1" | cut -d/ -f 1)
+
+/bin/umount /var/lib/machines/$cont/etc/resolv.conf
+/bin/umount /var/lib/machines/$cont/$HOME
+/bin/umount /var/lib/machines/$cont/dev/shm
+/bin/umount /var/lib/machines/$cont/dev
+/bin/umount /var/lib/machines/$cont/proc
+
+
+
+
+
+

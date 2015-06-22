@@ -1,0 +1,22 @@
+#! /bin/bash -ex
+
+# This script is to be invoked by apcon@.service before the application starts.
+# The only parameter accepted is instance (unescaped). The script should mount all
+# necessary filesystems inside the container.
+# The instance name is expected in the format "container/executable/path arg arg arg".
+# Only the first element before the first slash is of interest.
+
+([ -z "$1" ] || [ -z "$HOME" ] || [ -z "$USER" ]) && {
+	echo "No instance or home directory or username provided"
+	exit 1
+}
+
+cont=$(echo "$1" | cut -d/ -f 1)
+
+/bin/mount -t proc proc /var/lib/machines/$cont/proc
+/bin/mount --bind /dev /var/lib/machines/$cont/dev
+/bin/mount -t tmpfs tmpfs /var/lib/machines/$cont/dev/shm
+/bin/mkdir -p /var/lib/machines/$cont/$HOME
+/bin/mount --bind $HOME /var/lib/machines/$cont/$HOME
+/usr/bin/touch /var/lib/machines/$cont/etc/resolv.conf
+/bin/mount --bind /etc/resolv.conf /var/lib/machines/$cont/etc/resolv.conf

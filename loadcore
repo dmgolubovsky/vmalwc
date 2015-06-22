@@ -84,6 +84,13 @@ sshkey=$(find_ssh_keys)
 	echo HOME=$HOME
 ) > $CONFIG_DRIVE/user_environment
 
+# Zip the opt/vmalwc directory on the host to place the zipfile to the config drive
+
+(
+	cd $TOP/extrafiles
+	zip -r $CONFIG_DRIVE/opt.vmalwc.zip ./opt
+)
+
 # Create an user for coreos with the same name as the current user, enable public key login.
 # Add a number of systemd units to run at start.
 
@@ -109,11 +116,13 @@ coreos:
       content: |
         [Service]
         Type=oneshot
+        WorkingDirectory=/
         ExecStartPre=/bin/cp /media/configvirtfs/host-localtime /etc/localtime
-        ExecStartPre=/bin/mkdir -p /etc/vmalwc/
+        ExecStartPre=/bin/mkdir -p /etc/vmalwc /opt/vmalwc
         ExecStartPre=/bin/cp /media/configvirtfs/user_info /etc/vmalwc/environment
         ExecStartPre=/bin/cp /media/configvirtfs/user_environment /etc/vmalwc/user_environment
         ExecStartPre=/bin/sh -c "echo NUID=`id -u $USER` >> /etc/vmalwc/user_environment"
+        ExecStartPre=/usr/bin/unzip /media/configvirtfs/opt.vmalwc.zip
         ExecStart=/bin/true
     - name: remove-default-user.service
       command: start
@@ -150,6 +159,7 @@ EOF
 done
 ) >> $CONFIG_DRIVE/openstack/latest/user_data
 
+cat $CONFIG_DRIVE/openstack/latest/user_data
 
 $TOP/bin/fghc -id $$-loadcore -mem 1G -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
 	-hostname $name \
@@ -165,7 +175,7 @@ FONT=${FONT:-terminus-18}
 
 ssh-keyscan -v -p 2222 -T 20 -t dsa,ecdsa,ed25519 localhost
 
-sleep 1
+sleep 2
 
 cd $WDIR
 

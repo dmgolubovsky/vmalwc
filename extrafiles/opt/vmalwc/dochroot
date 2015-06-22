@@ -1,0 +1,17 @@
+#! /bin/bash -ex
+
+# This script is to be invoked by apcon@.service to start the application.
+# The only parameter accepted is instance (unescaped). The script should change root
+# to the instance container and run the application
+# The instance name is expected in the format "container/executable/path arg arg arg".
+# The elements after the first slash are of interest.
+
+([ -z "$1" ] || [ -z "$HOME" ] || [ -z "$USER" ] || [ -z "$NUID" ]) && {
+	echo "No instance or home directory or username/uid provided"
+	exit 1
+}
+
+app="$(echo $1 | sed 's/^[^/]*\///g')"
+cont=$(echo "$1" | cut -d/ -f 1)
+
+/bin/chroot --userspec=$NUID:$NUID /var/lib/machines/$cont $app
