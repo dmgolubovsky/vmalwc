@@ -1,14 +1,15 @@
 # An instantiated service file to start an application in a container
 
-# Instance structure: containername
+# Instance structure: containername/executable args
 
 [Service]
 
-Type=simple
+Type=oneshot
 EnvironmentFile=-/etc/vmalwc/environment
 EnvironmentFile=-/etc/vmalwc/user_environment
 StandardOutput=journal
 StandardError=journal
-ExecStartPre=/opt/vmalwc/premount "%I"
-ExecStart=/opt/vmalwc/dochroot "%I"
-ExecStopPost=/opt/vmalwc/postumount "%I"
+ExecStart=-/opt/vmalwc/premount "%I"
+ExecStart=-/opt/vmalwc/dochroot "%I"
+ExecStart=-/opt/vmalwc/postumount "%I"
+

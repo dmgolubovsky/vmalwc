@@ -13,11 +13,15 @@
 
 cont=$(echo "$1" | cut -d/ -f 1)
 
-/bin/umount /var/lib/machines/$cont/etc/resolv.conf
-/bin/umount /var/lib/machines/$cont/$HOME
-/bin/umount /var/lib/machines/$cont/dev/shm
-/bin/umount /var/lib/machines/$cont/dev
-/bin/umount /var/lib/machines/$cont/proc
+for mp in \
+	/var/lib/machines/$cont/etc/resolv.conf \
+	/var/lib/machines/$cont/$HOME \
+	/var/lib/machines/$cont/dev/shm \
+	/var/lib/machines/$cont/dev \
+	/var/lib/machines/$cont/proc ; do
+	mountpoint -q $mp && /bin/umount $mp
+done
+exit 0
 
 
 

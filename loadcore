@@ -144,7 +144,7 @@ EOF
 # to add to the cloud config file. Use the X-cloud-config-command line to form the command parameter.
 
 (
-	for s in "$@" ; do
+	for s in $TOP/baseunits/* "$@" ; do
 		if [ ! -r $s ] ; then
 			continue
 		fi
