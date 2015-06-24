@@ -1,0 +1,4 @@
+#! /bin/bash
+
+# Pull an image from docker, export tar, turn into an image
+

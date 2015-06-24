@@ -4,12 +4,11 @@
 
 [Service]
 
-Type=oneshot
+Type=simple
 EnvironmentFile=-/etc/vmalwc/environment
 EnvironmentFile=-/etc/vmalwc/user_environment
 StandardOutput=journal
 StandardError=journal
-ExecStart=-/opt/vmalwc/premount "%I"
-ExecStart=-/opt/vmalwc/dochroot "%I"
-ExecStart=-/opt/vmalwc/postumount "%I"
-
+ExecStart=/bin/sh -c '/opt/vmalwc/premount "%I" ; /opt/vmalwc/dochroot "%I"'
+ExecStopPost=-/opt/vmalwc/postumount "%I"
+PrivateTmp=true
