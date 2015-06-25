@@ -1,4 +1,41 @@
-#! /bin/bash
+#! /bin/bash -ex
 
-# Pull an image from docker, export tar, turn into an image
+# Pull an image from docker, export tar, turn into a machine image.
+# Assuming that a http server is running at localhost:8080 and /zzz
+# is the directory served over http.
 
+[ -z "$2" ] && {
+	echo Usage: `basename $0` docker/package-name imagename
+	exit 1
+}
+
+pkgname="$1"
+
+imgname="$2"
+
+pkghash=`echo $1 | md5sum | cut -d" " -f 1`
+
+[ -d /zzz ] || {
+	echo Expected HTTP-served directory not found
+	exit 1
+}
+
+echo >/zzz/$pkghash || {
+	echo Expected HTTP-served directory not writable
+	exit 1
+}
+
+wget -q http://localhost:8080/$pkghash -O /dev/null || {
+	echo HTTP server is not running
+	exit 1
+}
+
+rm /zzz/$pkghash
+
+docker create --name $pkghash $pkgname
+
+docker export -o /zzz/${imgname}.tar $pkghash
+
+machinectl --verify=no pull-tar http://localhost:8080/${imgname}.tar
+
+docker rm $pkghash
