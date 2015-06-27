@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# Scan all existing mount tags and mount them except for config-2 under /mnt/host
+
+base=/mnt/host
+
+mkdir -p $base
+
+find /sys/devices -name mount_tag | while read ; do
+	tag=`cat $REPLY`
+	case "$tag" in
+		config-2)
+			continue
+			;;
+		*)
+			mkdir -p $base/$tag
+			mount -t 9p $tag $base/$tag
+	esac
+done

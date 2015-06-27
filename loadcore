@@ -123,6 +123,7 @@ coreos:
         ExecStartPre=/bin/cp /media/configvirtfs/user_environment /etc/vmalwc/user_environment
         ExecStartPre=/bin/sh -c "echo NUID=`id -u $USER` >> /etc/vmalwc/user_environment"
         ExecStartPre=/usr/bin/unzip /media/configvirtfs/opt.vmalwc.zip
+        ExecStartPre=/opt/bin/mount9ptags
         ExecStart=/bin/true
     - name: remove-default-user.service
       command: start
@@ -161,11 +162,14 @@ done
 
 cat $CONFIG_DRIVE/openstack/latest/user_data
 
+mkdir -p $TOP/workarea
+
 $TOP/bin/fghc -id $$-loadcore -mem 1G -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
 	-hostname $name \
 	-step loadcore -host -lbrst -xkernel $KERNEL -fwd 2222:22 -info $CONFIG_DRIVE/user_info \
 		       -lib conf -path $CONFIG_DRIVE -ro -tag config-2 \
 		       -lib core -path $COREDIR/coreos_production_qemu_image.img -snap -rw \
+ 		       -lib workarea -path $TOP/workarea -rw \
 		       -lib imgstor -path $IMGSTOR -rw \
 	-make &
 

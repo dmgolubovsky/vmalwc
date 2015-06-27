@@ -11,6 +11,7 @@ apps/**
 external/**
 units/**
 coreos/**
+workarea/**
 extrafiles/usr/**
 *~
 *.swp

@@ -11,6 +11,7 @@ Description=Start an application container without persistent user home director
 Type=simple
 EnvironmentFile=-/etc/vmalwc/environment
 EnvironmentFile=-/etc/vmalwc/user_environment
+Environment=LANG=en_US.UTF-8
 StandardOutput=journal
 StandardError=journal
 ExecStart=/bin/sh -c '/opt/vmalwc/premount "%I" ; /opt/vmalwc/dochroot "%I"'
