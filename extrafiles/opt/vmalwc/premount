@@ -15,8 +15,12 @@ cont=$(echo "$1" | cut -d/ -f 1)
 
 /bin/mount -t proc proc /var/lib/machines/$cont/proc
 /bin/mount --bind /dev /var/lib/machines/$cont/dev
+/bin/mount -t devpts devpts /var/lib/machines/$cont/dev/pts
 /bin/mount -t tmpfs tmpfs /var/lib/machines/$cont/dev/shm
 /bin/mkdir -p /var/lib/machines/$cont/$HOME
 /bin/mount --bind $HOME /var/lib/machines/$cont/$HOME
-/usr/bin/touch /var/lib/machines/$cont/etc/resolv.conf
-/bin/mount --bind /etc/resolv.conf /var/lib/machines/$cont/etc/resolv.conf
+for f in /etc/resolv.conf /etc/passwd /etc/group /etc/localtime ; do
+	/usr/bin/touch /var/lib/machines/$cont/$f
+	/bin/mount --bind $f /var/lib/machines/$cont/$f
+done
+

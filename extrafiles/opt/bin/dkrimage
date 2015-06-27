@@ -36,6 +36,15 @@ docker create --name $pkghash $pkgname
 
 docker export -o /zzz/${imgname}.tar $pkghash
 
-machinectl --verify=no pull-tar http://localhost:8080/${imgname}.tar
+url="http://localhost:8080/${imgname}.tar"
+
+machinectl --verify=no pull-tar $url
+
+escurl=.`systemd-escape -- $url`
 
 docker rm $pkghash
+
+(
+	cd /var/lib/machines
+	rm -rf $escurl || btrfs subvolume delete $escurl
+)

@@ -37,7 +37,7 @@ for p in $(cat $WDIR/*.pid) ; do
 	kill $p
 done
 
-./loadbase
+./loadcore units/*
 
 kill -9 $PTPID
 

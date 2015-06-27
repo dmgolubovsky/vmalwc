@@ -181,7 +181,7 @@ cd $WDIR
 
 vmon=`find . -name "$$-loadcore*.monitor" || exit 0`
 
-xterm -fn $FONT -fg lightgreen -bg black -title "$name: Console [$$]" -fullscreen \
+xterm -fn $FONT -fg lightgreen -bg black -title "$name: Console [$$]" -geometry 100x40 \
 	-e ssh -q -o StrictHostKeyChecking=no -p 2222 localhost && \
 	(echo quit | socat stdio "unix-connect:$vmon")
 

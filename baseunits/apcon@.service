@@ -2,6 +2,10 @@
 
 # Instance structure: containername/executable args
 
+[Unit]
+
+Description=Start an application container without persistent user home directory
+
 [Service]
 
 Type=simple

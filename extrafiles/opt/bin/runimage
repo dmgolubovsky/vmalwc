@@ -1,0 +1,13 @@
+#! /bin/bash -ex
+
+[ -z "$2" ] && {
+	echo "Usage: `basename $0` service@image command [args]"
+	exit 1
+}
+
+c="$1"
+
+shift
+
+systemctl start "$c/`systemd-escape -- $@`"
+journalctl -f
