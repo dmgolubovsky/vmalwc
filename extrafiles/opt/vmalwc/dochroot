@@ -14,4 +14,5 @@
 app="$(echo $1 | sed 's/^[^/]*\///g')"
 cont=$(echo "$1" | cut -d/ -f 1)
 
+/bin/chroot /var/lib/machines/$cont locale-gen en_US.UTF-8 || /bin/true
 /bin/chroot --userspec=$NUID:$NUID /var/lib/machines/$cont $app

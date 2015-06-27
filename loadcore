@@ -149,6 +149,12 @@ EOF
 		if [ ! -r $s ] ; then
 			continue
 		fi
+		case $s in
+			*~)
+			continue
+			;;
+			*)
+		esac
 		ucmd=$(grep "X-cloud-config-command=" $s | cut -d= -f 2)
 		indent="    "
 		echo "${indent}- name: $(basename $s)"
@@ -170,12 +176,13 @@ $TOP/bin/fghc -id $$-loadcore -mem 1G -kvm  $KVM -workdir $WDIR -video -audio -x
 		       -lib conf -path $CONFIG_DRIVE -ro -tag config-2 \
 		       -lib core -path $COREDIR/coreos_production_qemu_image.img -snap -rw \
  		       -lib workarea -path $TOP/workarea -rw \
+ 		       -lib startup -path $TOP/units -rw \
 		       -lib imgstor -path $IMGSTOR -rw \
 	-make &
 
 
 
-FONT=${FONT:-terminus-18}
+FONT=${FONT:-terminus-16}
 
 ssh-keyscan -v -p 2222 -T 20 -t dsa,ecdsa,ed25519 localhost
 
