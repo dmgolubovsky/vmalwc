@@ -8,6 +8,7 @@ import (
 	"os"
 	"fmt"
 	"strings"
+	"runtime"
 	"path/filepath"
 	"github.com/bu-/magic"
 	"github.com/cznic/mathutil"
@@ -44,7 +45,8 @@ func dumpstep(p io.WriteCloser, s *Step, j *Job) {
 	rstep := j.id + "." + s.name
 	status := filepath.Join(j.wdir, rstep + ".status")
 	fmt.Fprintln(p, "\t echo 'in progress' >" + status)
-	enkvm := " `kvm-ok >/dev/null && echo -cpu host -enable-kvm`"
+	ncpu := runtime.NumCPU()
+	enkvm := " `kvm-ok >/dev/null && echo -cpu host -smp " + fmt.Sprint(ncpu) + " -enable-kvm`"
 	fmt.Fprintln(p, "\t(" + j.kvm + enkvm + " -vga none -no-reboot -name " + s.name + " \\")
 	if havekernel {
 		fmt.Fprintln(p, "\t -kernel " + j.kernel + " \\")
