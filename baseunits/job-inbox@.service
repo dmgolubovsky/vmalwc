@@ -1,0 +1,8 @@
+# A service to be activated when container inbox is not empty
+
+[Unit]
+Description=Activate when new files appear in the contaner inbox
+
+[Service]
+Type=simple
+ExecStart=/opt/bin/submitjob %f

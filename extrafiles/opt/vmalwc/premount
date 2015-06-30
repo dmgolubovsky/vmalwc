@@ -17,8 +17,20 @@ cont=$(echo "$1" | cut -d/ -f 1)
 /bin/mount --bind /dev /var/lib/machines/$cont/dev
 /bin/mount -t devpts devpts /var/lib/machines/$cont/dev/pts
 /bin/mount -t tmpfs tmpfs /var/lib/machines/$cont/dev/shm
-/bin/mkdir -p /var/lib/machines/$cont/$HOME
-/bin/mount --bind $HOME /var/lib/machines/$cont/$HOME
+/bin/mkdir -p /var/lib/machines/$cont/$HOME $HOME/$cont
+/bin/chown $USER /var/lib/machines/$cont/$HOME $HOME/$cont
+/bin/mount --bind $HOME/$cont /var/lib/machines/$cont/$HOME
+/bin/mkdir -p /var/lib/machines/$cont/usr/share/applications
+/bin/mkdir -p /var/vmalwc /var/lib/machines/$cont/usr/share/vmalwc
+/bin/mount --bind -r /var/vmalwc /var/lib/machines/$cont/usr/share/vmalwc
+/bin/mount --bind -r /var/vmalwc/allapps/desktop /var/lib/machines/$cont/usr/share/applications
+/bin/mkdir -p /var/vmalwc/boxes/$cont/inbox
+/bin/chown $USER /var/vmalwc/boxes/$cont/inbox
+/bin/mkdir -p /var/lib/machines/$cont/var/vmalwc/inbox
+/bin/mount --bind /var/vmalwc/boxes/$cont/inbox /var/lib/machines/$cont/var/vmalwc/inbox
+/bin/mkdir -p /var/lib/machines/$cont/opt/vmalwc/bin
+/bin/mount --bind -r /opt/vmalwc/client /var/lib/machines/$cont/opt/vmalwc/bin
+/usr/bin/systemctl start job-inbox@$cont.path
 for f in /etc/resolv.conf /etc/passwd /etc/group /etc/localtime ; do
 	/usr/bin/touch /var/lib/machines/$cont/$f
 	/bin/mount --bind $f /var/lib/machines/$cont/$f

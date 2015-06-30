@@ -1,0 +1,46 @@
+#! /bin/bash -x
+
+# This script is run whenever there is one or more files in some container inbox.
+# Container name is passed as the first argument (should not be empty).
+
+[ -z "$1" ] && {
+	echo "`basename $0`: container name missing" >&2
+	exit 1
+}
+
+# Start processing files as long as they are in the directory, quit afterwards.
+
+cont="$1"
+
+desktop() {
+	excp=`grep '^X-Exec=' $1 | head -n 1 | sed 's/%.//g' | cut -d"=" -f 2`
+	img=`grep '^X-Image=' $1 | head -n 1 | cut -d"=" -f 2`
+	( [  -z "$img" ] || [ -z "$excp" ] ) && return 0
+	/opt/bin/runimage "apcon@$img" $excp
+	return 0
+}
+
+dir=/var/vmalwc/boxes/$cont/inbox
+spool=/var/vmalwc/boxes/spool
+
+mkdir -p $spool
+
+for f in $dir/* ; do
+	if [ ! -r $f ] ; then
+		continue
+	fi
+	newf="${spool}/`basename $f`"
+	mv $f $newf
+	bnewf=`basename $newf`
+	suff="${bnewf##*.}"
+	case $suff in
+		desktop)
+			desktop $newf
+		;;
+		*)
+		echo "`basename $0`: file name suffix of $f is not supported" >&2
+	esac
+	rm -f $newf
+done
+
+exit 0

@@ -10,4 +10,4 @@ c="$1"
 shift
 
 systemctl start "$c/`systemd-escape -- $@`"
-journalctl -f
+tty -s && journalctl -f

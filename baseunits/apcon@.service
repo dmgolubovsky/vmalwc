@@ -5,6 +5,7 @@
 [Unit]
 
 Description=Start an application container without persistent user home directory
+After=copy-host-files.service
 
 [Service]
 

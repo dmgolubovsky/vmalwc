@@ -48,3 +48,5 @@ docker rm $pkghash
 	cd /var/lib/machines
 	rm -rf $escurl || btrfs subvolume delete $escurl
 )
+
+findapps

@@ -1,0 +1,7 @@
+# Path to container inbox
+
+[Unit]
+Description=Watch for a container inbox for job files to appear there
+
+[Path]
+DirectoryNotEmpty=/var/vmalwc/boxes/%f/inbox

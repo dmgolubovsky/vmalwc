@@ -1,0 +1,33 @@
+#! /bin/bash
+
+# Submit the file provided on stdin or as the first argument to the host.
+
+[ -z "$1" ] && {
+	echo "Usage: `basename $0` jobfile or `basename $0` -o jobname" >&2
+	echo "Submit a job to the host for execution." >&2
+	echo "Either provide file name as the first argument, and job name will be based" >&2
+	echo "on that file name, or provide job file contents on the standard input," >&2
+	echo "then specify job name with -o parameter which is mandatory in such case" >&2
+	echo "Full job name will be randomized with current time and printed to stdout" >&2
+	exit 1
+}
+
+rand=`date +"%s.%N"`
+
+case "$1" in
+	-o)
+		[ -z "$2" ] && {
+			echo "`basename $0`: -o option requires job name to be specified" >&2
+			exit 1
+		}
+		jn="$2"
+		src=/proc/self/fd/0
+		;;
+	*)
+		jn=`basename "$1"`
+		src="$1"
+esac
+
+dst=/var/vmalwc/inbox/${rand}.${jn}
+
+cat $src >$dst

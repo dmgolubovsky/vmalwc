@@ -114,6 +114,9 @@ coreos:
     - name: copy-host-files.service
       command: start
       content: |
+        [Unit]
+        Requires=var-lib-machines.mount
+        After=var-lib-machines.mount
         [Service]
         Type=oneshot
         WorkingDirectory=/
@@ -124,6 +127,7 @@ coreos:
         ExecStartPre=/bin/sh -c "echo NUID=`id -u $USER` >> /etc/vmalwc/user_environment"
         ExecStartPre=/usr/bin/unzip /media/configvirtfs/opt.vmalwc.zip
         ExecStartPre=/opt/bin/mount9ptags
+        ExecStartPre=/opt/bin/findapps
         ExecStart=/bin/true
     - name: remove-default-user.service
       command: start

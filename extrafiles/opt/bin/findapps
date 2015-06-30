@@ -1,0 +1,72 @@
+#! /bin/bash
+
+# Perform search of .desktop files in all images and copy
+# them along with icons to the dedicated location /usr/share/allapps
+
+IMGDIR=/var/lib/machines
+APPDIR=/var/vmalwc/allapps
+CAPPDIR=/usr/share/vmalwc/allapps
+
+mkdir -p $APPDIR/desktop $APPDIR/icons
+
+findexe() {
+	[ -z "$2" ] && return 0
+	for d in "$1" "$1/bin" "$1/usr/bin" ; do
+		[ -x "$d/$2" ] && return 0
+		[ -L "$d/$2" ] && return 0
+		[ -x "$d/`basename $2`" ] && return 0
+		[ -L "$d/`basename $2`" ] && return 0
+	done
+	return 1
+}
+
+oneimg() {
+	IMGID="$1"
+	find $IMGDIR/$IMGID -name '*.desktop' | while read ; do
+		if [ `grep '^Exec' $REPLY | wc -l` = 0 ] ; then
+			continue
+		fi
+		dst=$APPDIR/desktop/${IMGID}.`basename $REPLY`
+		icon=""
+		type=`grep '^Type=' $REPLY | head -n 1`
+		icon=`grep '^Icon=' $REPLY | head -n 1`
+		name=`grep '^Name=' $REPLY | head -n 1`
+		comt=`grep '^Comment=' $REPLY | head -n 1`
+		term=`grep '^Terminal=' $REPLY | head -n 1`
+		cats=`grep '^Categories=' $REPLY | head -n 1`
+		excp=`grep '^Exec=' $REPLY | head -n 1`
+		exprog=`echo $excp | cut -d'=' -f 2 | cut -d" " -f 1`
+		if ! findexe $IMGDIR/$IMGID $exprog ; then
+			echo removed $dst: $exprog does not exist in $IMGID
+			rm -f $dst
+			continue
+		fi
+		name="$name [$IMGID]"
+		iconfile=`echo $icon | cut -d'=' -f 2`
+		if [ -z "$iconfile" ] ; then
+			continue
+		fi
+		for icn in $IMGDIR/$IMGID/$iconfile \
+			`find $IMGDIR/$IMGID/usr/share/pixmaps/$(basename $iconfile).*` ; do
+			if [ -f $icn ] ; then
+				cp $icn $APPDIR/icons
+				iconfile2=$CAPPDIR/icons/`basename $icn`
+				break
+			fi
+		done
+		echo "[Desktop Entry]" > $dst
+		echo "Icon=$iconfile2" >> $dst
+		echo "$name" >> $dst
+		echo "$comt" >> $dst
+		echo "$term" >> $dst
+		echo "$cats" >> $dst
+		echo "Exec=/opt/vmalwc/bin/submit %k" >> $dst
+		echo "X-$excp" >> $dst
+		echo "X-Image=$IMGID" >> $dst
+		echo wrote $dst
+	done
+}
+
+for i in $IMGDIR/* ; do
+	oneimg `basename $i`
+done
