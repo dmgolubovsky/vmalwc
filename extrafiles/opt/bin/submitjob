@@ -29,6 +29,7 @@ for f in $dir/* ; do
 	if [ ! -r $f ] ; then
 		continue
 	fi
+	sleep 0.5
 	newf="${spool}/`basename $f`"
 	mv $f $newf
 	bnewf=`basename $newf`

@@ -40,13 +40,13 @@ url="http://localhost:8080/${imgname}.tar"
 
 machinectl --verify=no pull-tar $url
 
-escurl=.`systemd-escape -- $url`
+escurl=.tar-`echo -n $url | sed 's/\//\\\x2f/g' | sed 's/\./\\\x2e/g'`
 
 docker rm $pkghash
 
 (
 	cd /var/lib/machines
-	rm -rf $escurl || btrfs subvolume delete $escurl
-)
+	btrfs subvolume delete $escurl || rm -rf $escurl
+) 2>&1 >/dev/null
 
 findapps
