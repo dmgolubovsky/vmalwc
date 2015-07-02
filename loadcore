@@ -125,7 +125,6 @@ coreos:
         ExecStartPre=/usr/bin/unzip /media/configvirtfs/opt.vmalwc.zip
         ExecStartPre=/opt/bin/mount9ptags
         ExecStartPre=/opt/vmalwc/btrfs_cleanup
-        ExecStartPre=/bin/sleep 10
         ExecStart=/opt/bin/findapps
     - name: remove-default-user.service
       command: start

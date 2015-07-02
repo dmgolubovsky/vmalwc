@@ -75,4 +75,5 @@ for i in $IMGDIR/* ; do
 		*)
 			oneimg `basename $i`
 	esac
+	/bin/sleep 0.$[ ( $RANDOM % 10 ) + 1 ]s
 done

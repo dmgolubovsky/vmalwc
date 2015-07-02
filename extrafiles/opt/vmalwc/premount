@@ -36,8 +36,9 @@ btrfs sub snaps /var/lib/machines/$cont /var/lib/machines/$sncont
 /bin/mount --bind /var/vmalwc/boxes/$cont/inbox /var/lib/machines/$sncont/var/vmalwc/inbox
 /bin/mkdir -p /var/lib/machines/$sncont/opt/vmalwc/bin
 /bin/mount --bind -r /opt/vmalwc/client /var/lib/machines/$sncont/opt/vmalwc/bin
-/bin/mkdir -p /var/lib/machines/$sncont/var/run/dbus
+/bin/mkdir -p /var/lib/machines/$sncont/var/run/dbus /var/lib/machines/$sncont/run/dbus
 /bin/mount --bind -r /var/run/dbus /var/lib/machines/$sncont/var/run/dbus
+/bin/mount --bind -r /var/run/dbus /var/lib/machines/$sncont/run/dbus
 /usr/bin/systemctl start job-inbox@$cont.path
 for f in /etc/resolv.conf /etc/passwd /etc/group /etc/localtime ; do
 	/usr/bin/touch /var/lib/machines/$sncont/$f
