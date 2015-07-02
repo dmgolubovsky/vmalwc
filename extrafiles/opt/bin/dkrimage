@@ -47,6 +47,7 @@ docker rm $pkghash
 (
 	cd /var/lib/machines
 	btrfs subvolume delete $escurl || rm -rf $escurl
+	btrfs prop set -ts $imgname readonly true
 ) 2>&1 >/dev/null
 
 findapps

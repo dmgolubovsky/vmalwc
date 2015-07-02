@@ -37,7 +37,16 @@ for p in $(cat $WDIR/*.pid) ; do
 	kill $p
 done
 
-./loadcore units/*
+# If there is no window manager running then start core with extra units
+# that may contain window manager as well, otherwise just start core itself.
+
+if (wmctrl -l 2>&1 >/dev/null) ; then
+
+	./loadcore
+
+else
+	./loadcore units/*
+fi
 
 kill -9 $PTPID
 

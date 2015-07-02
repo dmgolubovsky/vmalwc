@@ -3,9 +3,6 @@
 # stolen from the original coreos run script.
 
 find_ssh_keys() {
-    if [ -S "$SSH_AUTH_SOCK" ]; then
-        ssh-add -L
-    fi
     for default_key in ~/.ssh/id_*.pub; do
         if [ ! -f "$default_key" ]; then
             continue
@@ -70,7 +67,7 @@ if [ ! -f $IMGSTOR ] ; then
 	df=`df --output=avail $WDIR | tail -n 1`
 	imsz=$(($df/4))
 	fallocate -l ${imsz}K $IMGSTOR
-	mkfs.btrfs $IMGSTOR
+	/sbin/mkfs.btrfs $IMGSTOR || mkfs.btrfs $IMGSTOR
 fi
 
 # Extract the SSH public key for the current user
@@ -118,7 +115,7 @@ coreos:
         Requires=var-lib-machines.mount
         After=var-lib-machines.mount
         [Service]
-        Type=oneshot
+        Type=simple
         WorkingDirectory=/
         ExecStartPre=/bin/cp /media/configvirtfs/host-localtime /etc/localtime
         ExecStartPre=/bin/mkdir -p /etc/vmalwc /opt/vmalwc
@@ -127,8 +124,9 @@ coreos:
         ExecStartPre=/bin/sh -c "echo NUID=`id -u $USER` >> /etc/vmalwc/user_environment"
         ExecStartPre=/usr/bin/unzip /media/configvirtfs/opt.vmalwc.zip
         ExecStartPre=/opt/bin/mount9ptags
-        ExecStartPre=/opt/bin/findapps
-        ExecStart=/bin/true
+        ExecStartPre=/opt/vmalwc/btrfs_cleanup
+        ExecStartPre=/bin/sleep 10
+        ExecStart=/opt/bin/findapps
     - name: remove-default-user.service
       command: start
       content: |

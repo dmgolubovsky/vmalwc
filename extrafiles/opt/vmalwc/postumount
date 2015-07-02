@@ -12,15 +12,11 @@
 }
 
 cont=$(echo "$1" | cut -d/ -f 1)
+snapid=`echo "$1" | md5sum - | cut -d" " -f 1`
+sncont="@${cont}.${snapid}"
 
-for mp in \
-	/var/lib/machines/$cont/etc/resolv.conf \
-	/var/lib/machines/$cont/$HOME \
-	/var/lib/machines/$cont/dev/shm \
-	/var/lib/machines/$cont/dev \
-	/var/lib/machines/$cont/proc ; do
-	mountpoint -q $mp && /bin/umount $mp
-done
+btrfs subvol del /var/lib/machines/$sncont
+
 exit 0
 
 

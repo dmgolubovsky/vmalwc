@@ -68,5 +68,11 @@ oneimg() {
 }
 
 for i in $IMGDIR/* ; do
-	oneimg `basename $i`
+	case $i in
+		@*)
+			continue
+			;;
+		*)
+			oneimg `basename $i`
+	esac
 done

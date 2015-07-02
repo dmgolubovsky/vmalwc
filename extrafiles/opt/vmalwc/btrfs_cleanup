@@ -1,0 +1,29 @@
+#! /bin/bash -ex
+
+# Cleanup the temporary snapshots whose names start with @ that might have been left
+# from the previous run
+
+IMGDIR=/var/lib/machines
+
+oneround() {
+
+	snaps=`/sbin/btrfs sub list $IMGDIR | cut -d" " -f 9`
+	ret=1
+	for s in $snaps ; do
+		case $s in
+			\@*)
+				btrfs sub del $IMGDIR/$s || /bin/true
+				ret=0
+				;;
+			*)
+				continue
+		esac
+
+	done
+	return $ret
+}
+
+while oneround ; do
+	btrfs sub sync $IMGDIR
+done
+
