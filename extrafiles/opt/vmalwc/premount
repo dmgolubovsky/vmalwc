@@ -23,9 +23,13 @@ btrfs sub snaps /var/lib/machines/$cont /var/lib/machines/$sncont
 /bin/mount --bind /dev /var/lib/machines/$sncont/dev
 /bin/mount -t devpts devpts /var/lib/machines/$sncont/dev/pts
 /bin/mount -t tmpfs tmpfs /var/lib/machines/$sncont/dev/shm
-/bin/mkdir -p /var/lib/machines/$sncont/$HOME $HOME/$cont
-/bin/chown $USER /var/lib/machines/$sncont/$HOME $HOME/$cont
-/bin/mount --bind $HOME/$cont /var/lib/machines/$sncont/$HOME
+if [ -d /mnt/host/persistent_home/$cont ] && [ -w /mnt/host/persistent_home/$cont ] ; then
+	/bin/mount --bind /mnt/host/persistent_home/$cont /var/lib/machines/$sncont/$HOME
+else
+	/bin/mkdir -p /var/lib/machines/$sncont/$HOME $HOME/$cont
+	/bin/chown $USER /var/lib/machines/$sncont/$HOME $HOME/$cont
+	/bin/mount --bind $HOME/$cont /var/lib/machines/$sncont/$HOME
+fi
 /bin/mkdir -p /var/lib/machines/$sncont/usr/share/applications
 /bin/mkdir -p /var/vmalwc /var/lib/machines/$sncont/usr/share/vmalwc
 /bin/mount --bind -r /var/vmalwc /var/lib/machines/$sncont/usr/share/vmalwc

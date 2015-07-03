@@ -68,7 +68,7 @@ oneimg() {
 }
 
 for i in $IMGDIR/* ; do
-	case $i in
+	case `basename $i` in
 		@*)
 			continue
 			;;

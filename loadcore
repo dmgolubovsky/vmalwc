@@ -177,6 +177,7 @@ $TOP/bin/fghc -id $$-loadcore -mem 1G -kvm  $KVM -workdir $WDIR -video -audio -x
 		       -lib conf -path $CONFIG_DRIVE -ro -tag config-2 \
 		       -lib core -path $COREDIR/coreos_production_qemu_image.img -snap -rw \
  		       -lib workarea -path $TOP/workarea -rw \
+ 		       -lib persistent_home -path $TOP/workarea/phome -rw \
  		       -lib startup -path $TOP/units -rw \
 		       -lib imgstor -path $IMGSTOR -rw \
 	-make &
