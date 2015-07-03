@@ -23,10 +23,11 @@ btrfs sub snaps /var/lib/machines/$cont /var/lib/machines/$sncont
 /bin/mount --bind /dev /var/lib/machines/$sncont/dev
 /bin/mount -t devpts devpts /var/lib/machines/$sncont/dev/pts
 /bin/mount -t tmpfs tmpfs /var/lib/machines/$sncont/dev/shm
+/bin/mkdir -p /var/lib/machines/$sncont/$HOME
 if [ -d /mnt/host/persistent_home/$cont ] && [ -w /mnt/host/persistent_home/$cont ] ; then
 	/bin/mount --bind /mnt/host/persistent_home/$cont /var/lib/machines/$sncont/$HOME
 else
-	/bin/mkdir -p /var/lib/machines/$sncont/$HOME $HOME/$cont
+	/bin/mkdir -p $HOME/$cont
 	/bin/chown $USER /var/lib/machines/$sncont/$HOME $HOME/$cont
 	/bin/mount --bind $HOME/$cont /var/lib/machines/$sncont/$HOME
 fi
@@ -44,7 +45,7 @@ fi
 /bin/mount --bind -r /var/run/dbus /var/lib/machines/$sncont/var/run/dbus
 /bin/mount --bind -r /var/run/dbus /var/lib/machines/$sncont/run/dbus
 /usr/bin/systemctl start job-inbox@$cont.path
-for f in /etc/resolv.conf /etc/passwd /etc/group /etc/localtime ; do
+for f in /etc/resolv.conf /etc/passwd /etc/group /etc/localtime /etc/machine-id; do
 	/usr/bin/touch /var/lib/machines/$sncont/$f
 	/bin/mount --bind $f /var/lib/machines/$sncont/$f
 done

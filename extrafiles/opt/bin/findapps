@@ -9,6 +9,8 @@ CAPPDIR=/usr/share/vmalwc/allapps
 
 mkdir -p $APPDIR/desktop $APPDIR/icons
 
+rm -f $APPDIR/desktop/*.desktop
+
 findexe() {
 	[ -z "$2" ] && return 0
 	for d in "$1" "$1/bin" "$1/usr/bin" ; do
@@ -46,6 +48,7 @@ oneimg() {
 		if [ -z "$iconfile" ] ; then
 			continue
 		fi
+		iconfile2=""
 		for icn in $IMGDIR/$IMGID/$iconfile \
 			`find $IMGDIR/$IMGID/usr/share/pixmaps/$(basename $iconfile).*` ; do
 			if [ -f $icn ] ; then
@@ -55,7 +58,8 @@ oneimg() {
 			fi
 		done
 		echo "[Desktop Entry]" > $dst
-		echo "Icon=$iconfile2" >> $dst
+		[ ! -z "$iconfile2" ] && echo "Icon=$iconfile2" >> $dst
+		[ -z "$iconfile2" ] && echo "$icon" >> $dst
 		echo "$name" >> $dst
 		echo "$comt" >> $dst
 		echo "$term" >> $dst
