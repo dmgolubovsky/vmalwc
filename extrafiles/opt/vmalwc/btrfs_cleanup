@@ -24,6 +24,8 @@ oneround() {
 }
 
 while oneround ; do
-	btrfs sub sync $IMGDIR
+	/bin/true
 done
+
+btrfs sub sync $IMGDIR
 
