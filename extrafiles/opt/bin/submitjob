@@ -13,7 +13,7 @@
 cont="$1"
 
 desktop() {
-	excp=`grep '^X-Exec=' $1 | head -n 1 | sed 's/%.//g' | cut -d"=" -f 2`
+	excp=`grep '^X-Exec=' $1 | head -n 1 | sed 's/%.//g' | sed 's/^X-Exec=//g'`
 	img=`grep '^X-Image=' $1 | head -n 1 | cut -d"=" -f 2`
 	( [  -z "$img" ] || [ -z "$excp" ] ) && return 0
 	/opt/bin/runimage "apcon@$img" $excp
