@@ -64,7 +64,7 @@ oneimg() {
 		echo "$comt" >> $dst
 		echo "$term" >> $dst
 		echo "$cats" >> $dst
-		echo "Exec=/opt/vmalwc/bin/submit %k" >> $dst
+		echo "Exec=/opt/vmalwc/bin/submit /usr/share/applications/`basename $dst`" >> $dst
 		echo "X-$excp" >> $dst
 		echo "X-Image=$IMGID" >> $dst
 		echo wrote $dst
