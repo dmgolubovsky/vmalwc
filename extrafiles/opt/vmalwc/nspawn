@@ -22,9 +22,14 @@ fi
 /bin/chown $USER /var/vmalwc/boxes/$cont/inbox
 /usr/bin/systemctl start job-inbox@$cont.path
 
-/usr/bin/systemd-nspawn -D /var/lib/machines/$cont -x -u $NUID \
+IMGDIR=/var/lib/machines/$cont
+
+dbrs=`cd $IMGDIR && find . -name dbus-launch | head -n 1 | sed 's/^\.\///g'`
+
+/usr/bin/systemd-nspawn -D $IMGDIR -x -u $NUID \
 	--bind=$bhome:/$HOME \
 	--bind=/var/vmalwc/boxes/$cont/inbox:/var/vmalwc/inbox \
+	--bind-ro=/var/vmalwc:/usr/share/vmalwc \
 	--bind-ro=/var/vmalwc/allapps/desktop:/usr/share/applications \
 	--bind-ro=/var/run/dbus:/var/run/dbus \
 	--bind-ro=/var/run/dbus:/run/dbus \
@@ -37,5 +42,5 @@ fi
 	--setenv=LANG=en_US.UTF-8 \
 	--setenv=DISPLAY=$DISPLAY \
 	--setenv=PULSE_SERVER=$PULSE_SERVER \
-	$app
+	$dbrs -- $app
 

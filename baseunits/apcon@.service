@@ -15,7 +15,5 @@ EnvironmentFile=-/etc/vmalwc/user_environment
 Environment=LANG=en_US.UTF-8
 StandardOutput=journal
 StandardError=journal
-#ExecStart=/bin/sh -c '/opt/vmalwc/premount "%I" ; /opt/vmalwc/dochroot "%I"'
 ExecStart=/opt/vmalwc/nspawn "%I"
-ExecStopPost=-/opt/vmalwc/postumount "%I"
 PrivateTmp=true
