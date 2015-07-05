@@ -62,6 +62,7 @@ oneimg() {
 		[ -z "$iconfile2" ] && echo "$icon" >> $dst
 		echo "$name" >> $dst
 		echo "$comt" >> $dst
+		echo "$type" >> $dst
 		echo "$term" >> $dst
 		echo "$cats" >> $dst
 		echo "Exec=/opt/vmalwc/bin/submit /usr/share/applications/`basename $dst`" >> $dst

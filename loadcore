@@ -108,8 +108,14 @@ users:
       - $sshkey
 coreos:
   units:
-    - name: copy-host-files.service
+    - name: vmalwc-ready.target
       command: start
+      content: |
+        [Unit]
+        Description=Ready to run vmalwc containers
+        Requires=copy-host-files.service
+        After=copy-host-files.service
+    - name: copy-host-files.service
       content: |
         [Unit]
         Requires=var-lib-machines.mount
@@ -171,7 +177,7 @@ cat $CONFIG_DRIVE/openstack/latest/user_data
 
 mkdir -p $TOP/workarea
 
-$TOP/bin/fghc -id $$-loadcore -mem 1G -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
+$TOP/bin/fghc -id $$-loadcore -mem 2G -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
 	-hostname $name \
 	-step loadcore -host -lbrst -xkernel $KERNEL -fwd 2222:22 -info $CONFIG_DRIVE/user_info \
 		       -lib conf -path $CONFIG_DRIVE -ro -tag config-2 \

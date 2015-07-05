@@ -1,0 +1,41 @@
+#! /bin/bash -ex
+
+# Use systemd-nspawn to start the application container.
+
+([ -z "$1" ] || [ -z "$HOME" ] || [ -z "$USER" ] || [ -z "$NUID" ]) && {
+	echo "No instance or home directory or username/uid provided"
+	exit 1
+}
+
+
+app="$(echo $1 | sed 's/^[^/]*\///g')"
+cont=$(echo "$1" | cut -d/ -f 1)
+
+if [ -d /mnt/host/persistent_home/$cont ] && [ -w /mnt/host/persistent_home/$cont ] ; then
+	bhome=/mnt/host/persistent_home/$cont
+else
+	/bin/mkdir -p $HOME/$cont
+	/bin/chown $USER $HOME/$cont
+	bhome=$HOME/$cont
+fi
+/bin/mkdir -p /var/vmalwc/boxes/$cont/inbox
+/bin/chown $USER /var/vmalwc/boxes/$cont/inbox
+/usr/bin/systemctl start job-inbox@$cont.path
+
+/usr/bin/systemd-nspawn -D /var/lib/machines/$cont -x -u $NUID \
+	--bind=$bhome:/$HOME \
+	--bind=/var/vmalwc/boxes/$cont/inbox:/var/vmalwc/inbox \
+	--bind-ro=/var/vmalwc/allapps/desktop:/usr/share/applications \
+	--bind-ro=/var/run/dbus:/var/run/dbus \
+	--bind-ro=/var/run/dbus:/run/dbus \
+	--bind-ro=/etc/resolv.conf \
+	--bind-ro=/etc/passwd \
+	--bind-ro=/etc/group \
+	--bind-ro=/etc/localtime \
+	--bind-ro=/etc/machine-id \
+	--bind-ro=/opt/vmalwc/client:/opt/vmalwc/bin \
+	--setenv=LANG=en_US.UTF-8 \
+	--setenv=DISPLAY=$DISPLAY \
+	--setenv=PULSE_SERVER=$PULSE_SERVER \
+	$app
+
