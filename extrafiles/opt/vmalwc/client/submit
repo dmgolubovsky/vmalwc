@@ -4,6 +4,7 @@
 
 [ -z "$1" ] && {
 	echo "Usage: `basename $0` jobfile or `basename $0` -o jobname" >&2
+	echo "       `basename $0` -- image program arguments" >&2
 	echo "Submit a job to the host for execution." >&2
 	echo "Either provide file name as the first argument, and job name will be based" >&2
 	echo "on that file name, or provide job file contents on the standard input," >&2
@@ -23,6 +24,24 @@ case "$1" in
 		jn="$2"
 		src=/proc/self/fd/0
 		;;
+	--)
+		[ -z "$3" ] && {
+			echo "`basename $0`: -- option requires image and program names to be specified" >&2
+			exit 1
+		}
+		shift
+		img="$1"
+		pgm="$2"
+		shift 2
+		jn="$RANDOM"
+		line1="X-Image=$img"
+		line2="X-Exec=$pgm $@"
+		(
+			echo -- "$line1"
+			echo -- "$line2"
+		) > /var/vmalwc/inbox/${rand}.${jn}.desktop
+		exit
+		;;
 	*)
 		jn=`basename "$1"`
 		src="$1"
@@ -31,3 +50,5 @@ esac
 dst=/var/vmalwc/inbox/${rand}.${jn}
 
 cat $src >$dst
+
+echo `basename $dst`

@@ -39,13 +39,14 @@ done
 
 # If there is no window manager running then start core with extra units
 # that may contain window manager as well, otherwise just start core itself.
+# Pass all possible arguments from command line to loadcore
 
-if (wmctrl -l 2>&1 >/dev/null) ; then
+if (wmctrl -m 2>&1 >/dev/null) ; then
 
-	./loadcore
+	./loadcore "$@"
 
 else
-	./loadcore units/*
+	./loadcore units/* "$@"
 fi
 
 kill -9 $PTPID

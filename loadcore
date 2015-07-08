@@ -145,6 +145,20 @@ coreos:
         What=/dev/vdb
         Where=/var/lib/machines
         Type=btrfs
+    - name: vmalwc-console@.socket
+      content: |
+        [Socket]
+        ListenStream=/var/syssockets/%f/vmalwc.socket
+        Accept=yes
+        MaxConnections=4
+    - name: vmalwc-console@.service
+      content: |
+        [Service]
+        #Environment=CALLER=%f
+        ExecStart=/bin/bash -login
+        StandardIntput=socket
+        StandardOutput=socket
+        StandardError=socket
 EOF
 ) >> $CONFIG_DRIVE/openstack/latest/user_data
 
@@ -198,9 +212,23 @@ sleep 2
 
 cd $WDIR
 
+ztmo=8
+
 vmon=`find . -name "$$-loadcore*.monitor" || exit 0`
 
-xterm -fn $FONT -fg lightgreen -bg black -title "$name: Console [$$]" -geometry 100x40 \
-	-e ssh -q -o StrictHostKeyChecking=no -p 2222 localhost && \
-	(echo quit | socat stdio "unix-connect:$vmon")
+if ! ( seq 0 20 100 | while read ; do sleep 1 ; echo $REPLY ; done | \
+	zenity --progress --auto-close --no-cancel --text="Press Esc for console window") ; then
+
+	xterm -fn $FONT -fg lightgreen -bg black -title "$name: Console [$$]" -geometry 100x40 \
+		-e ssh -q -o StrictHostKeyChecking=no -p 2222 localhost && \
+		(echo quit | socat stdio "unix-connect:$vmon")
+
+else
+
+	while true ; do
+		socat stdio "unix-connect:$vmon" || exit
+		sleep 3
+	done
+
+fi
 

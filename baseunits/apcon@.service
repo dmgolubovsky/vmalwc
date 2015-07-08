@@ -1,4 +1,6 @@
-# An instantiated service file to start an application in a container
+# An instantiated service file to start an application in a container.
+# Upon termination number of running containers is checked, and if it is zero,
+# shutdown is forced.
 
 # Instance structure: containername/executable args
 
@@ -16,4 +18,5 @@ Environment=LANG=en_US.UTF-8
 StandardOutput=journal
 StandardError=journal
 ExecStart=/opt/vmalwc/nspawn "%I"
+ExecStopPost=/bin/sh -c 'sleep 5 ; (exit `machinectl list | grep nspawn | wc -l`) && poweroff'
 PrivateTmp=true

@@ -43,6 +43,15 @@ oneimg() {
 			rm -f $dst
 			continue
 		fi
+		if [ -L "$IMGDIR/$IMGID/$exprog" ] ; then
+			lprog=`readlink -n "$IMGDIR/$IMGID/$exprog"`
+			if [ -z "$lprog" ] ; then
+				echo removed $dst: cannot resolve symlink $exprog in $IMGID
+				rm -f $dst
+				continue
+			fi
+			excp="Exec=$lprog"
+		fi
 		name="$name [$IMGID]"
 		iconfile=`echo $icon | cut -d'=' -f 2`
 		if [ -z "$iconfile" ] ; then
