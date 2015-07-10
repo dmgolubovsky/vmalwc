@@ -59,13 +59,13 @@ if [ -z "$PULSE_SERVER" ] ; then
         export PULSE_SERVER=unix:`pactl info|grep "^Server String:"|cut -d":" -f 2|tr -d ' '`
 fi
 
-# If does not exist, create a btrfs volume of 1/4 space available for the work area path
+# If does not exist, create a btrfs volume of 1/3 space available for the work area path
 
 IMGSTOR="$WDIR/imagestore"
 
 if [ ! -f $IMGSTOR ] ; then
 	df=`df --output=avail $WDIR | tail -n 1`
-	imsz=$(($df/4))
+	imsz=$(($df/3))
 	fallocate -l ${imsz}K $IMGSTOR
 	/sbin/mkfs.btrfs $IMGSTOR || mkfs.btrfs $IMGSTOR
 fi
@@ -145,20 +145,6 @@ coreos:
         What=/dev/vdb
         Where=/var/lib/machines
         Type=btrfs
-    - name: vmalwc-console@.socket
-      content: |
-        [Socket]
-        ListenStream=/var/syssockets/%f/vmalwc.socket
-        Accept=yes
-        MaxConnections=4
-    - name: vmalwc-console@.service
-      content: |
-        [Service]
-        #Environment=CALLER=%f
-        ExecStart=/bin/bash -login
-        StandardIntput=socket
-        StandardOutput=socket
-        StandardError=socket
 EOF
 ) >> $CONFIG_DRIVE/openstack/latest/user_data
 
@@ -226,7 +212,7 @@ if ! ( seq 0 20 100 | while read ; do sleep 1 ; echo $REPLY ; done | \
 else
 
 	while true ; do
-		socat stdio "unix-connect:$vmon" || exit
+		(echo "" | socat stdio "unix-connect:$vmon") || exit
 		sleep 3
 	done
 

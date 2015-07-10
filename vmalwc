@@ -46,7 +46,7 @@ if (wmctrl -m 2>&1 >/dev/null) ; then
 	./loadcore "$@"
 
 else
-	./loadcore units/* "$@"
+	./loadcore  units/* "$@"
 fi
 
 kill -9 $PTPID

@@ -12,12 +12,28 @@
 
 cont="$1"
 
+# Process a .desktop file as a request to run an application.
+
 desktop() {
 	excp=`grep '^X-Exec=' $1 | head -n 1 | sed 's/%.//g' | sed 's/^X-Exec=//g'`
 	img=`grep '^X-Image=' $1 | head -n 1 | cut -d"=" -f 2`
 	( [  -z "$img" ] || [ -z "$excp" ] ) && return 0
 	/opt/bin/runimage "apcon@$img" $excp
 	return 0
+}
+
+# Process an .action file as a request for a system action. Action files are mainly
+# for large scale actions like shutdown or terminate a container, so often the desired
+# action is contained in a file name.
+
+action() {
+	case `basename $1 .action` in
+		poweroff|shutdown|reboot)
+			reboot
+		;;
+		*)
+			echo "$1: action not supported"
+	esac
 }
 
 dir=/var/vmalwc/boxes/$cont/inbox
@@ -38,8 +54,11 @@ for f in $dir/* ; do
 		desktop)
 			desktop $newf
 		;;
+		action)
+			action $newf
+		;;
 		*)
-		echo "`basename $0`: file name suffix of $f is not supported" >&2
+			echo "`basename $0`: file name suffix of $f is not supported" >&2
 	esac
 	rm -f $newf
 done
