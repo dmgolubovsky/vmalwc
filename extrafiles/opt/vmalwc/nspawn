@@ -11,13 +11,21 @@
 app="$(echo $1 | sed 's/^[^/]*\///g')"
 cont=$(echo "$1" | cut -d/ -f 1)
 
-if [ -d /mnt/host/persistent_home/$cont ] && [ -w /mnt/host/persistent_home/$cont ] ; then
-	bhome=/mnt/host/persistent_home/$cont
-else
-	/bin/mkdir -p $HOME/$cont
-	/bin/chown $USER $HOME/$cont
-	bhome=$HOME/$cont
+hcont=$cont
+
+if (echo $cont | grep '=' ) ; then
+	hcont=`echo $cont | cut -d'=' -f 2`
+	cont=`echo $cont | cut -d'=' -f 1`
 fi
+
+if [ -d /mnt/host/persistent_home/$hcont ] && [ -w /mnt/host/persistent_home/$hcont ] ; then
+	bhome=/mnt/host/persistent_home/$hcont
+else
+	/bin/mkdir -p $HOME/$hcont
+	/bin/chown $USER $HOME/$hcont
+	bhome=$HOME/$hcont
+fi
+
 /bin/mkdir -p /var/vmalwc/boxes/$cont/inbox
 /bin/chown $USER /var/vmalwc/boxes/$cont/inbox
 /usr/bin/systemctl start job-inbox@$cont.path

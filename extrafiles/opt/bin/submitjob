@@ -29,6 +29,7 @@ desktop() {
 action() {
 	case `basename $1 .action` in
 		poweroff|shutdown|reboot)
+			[ -d /mnt/host/shutdown_me ] && echo > /mnt/host/shutdown_me/shutdown.me
 			reboot
 		;;
 		*)

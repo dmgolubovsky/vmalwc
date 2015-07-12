@@ -38,6 +38,11 @@ docker export -o /zzz/${imgname}.tar $pkghash
 
 url="http://localhost:8080/${imgname}.tar"
 
+(
+	cd /var/lib/machines
+	btrfs subvolume delete $imgname || rm -rf $imgname
+) 2>&1 >/dev/null
+
 machinectl --verify=no pull-tar $url
 
 escurl=.tar-`echo -n $url | sed 's/\//\\\x2f/g' | sed 's/\./\\\x2e/g'`

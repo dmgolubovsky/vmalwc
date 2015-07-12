@@ -175,7 +175,10 @@ done
 
 cat $CONFIG_DRIVE/openstack/latest/user_data
 
-mkdir -p $TOP/workarea
+mkdir -p $TOP/workarea/sdme
+
+
+rm -f $TOP/workarea/sdme/*
 
 $TOP/bin/fghc -id $$-loadcore -mem 2G -kvm  $KVM -workdir $WDIR -video -audio -xdisplay $XDISPLAY \
 	-hostname $name \
@@ -184,6 +187,7 @@ $TOP/bin/fghc -id $$-loadcore -mem 2G -kvm  $KVM -workdir $WDIR -video -audio -x
 		       -lib core -path $COREDIR/coreos_production_qemu_image.img -snap -rw \
  		       -lib workarea -path $TOP/workarea -rw \
  		       -lib persistent_home -path $TOP/workarea/phome -rw \
+ 		       -lib shutdown_me -path $TOP/workarea/sdme -rw \
  		       -lib startup -path $TOP/units -rw \
 		       -lib imgstor -path $IMGSTOR -rw \
 	-make &
@@ -194,11 +198,7 @@ FONT=${FONT:-terminus-16}
 
 ssh-keyscan -v -p 2222 -T 20 -t dsa,ecdsa,ed25519 localhost
 
-sleep 2
-
 cd $WDIR
-
-ztmo=8
 
 vmon=`find . -name "$$-loadcore*.monitor" || exit 0`
 
@@ -212,8 +212,11 @@ if ! ( seq 0 20 100 | while read ; do sleep 1 ; echo $REPLY ; done | \
 else
 
 	while true ; do
-		(echo "" | socat stdio "unix-connect:$vmon") || exit
-		sleep 3
+		[ -e $TOP/workarea/sdme/shutdown.me ] && {
+			(echo quit | socat stdio "unix-connect:$vmon")
+			exit
+		}
+		sleep 1
 	done
 
 fi

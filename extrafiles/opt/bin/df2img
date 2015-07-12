@@ -1,0 +1,12 @@
+#! /bin/sh
+
+# Build an image from dockerfile, export tar, turn into a machine image.
+# Assuming that a http server is running at localhost:8080 and /zzz
+# is the directory served over http.
+
+[ -z "$2" ] && {
+        echo Usage: `basename $0` dockerfile imagename
+        exit 1
+}
+
+dkrimage `docker build -q - <$1 | tee /dev/stderr |grep ^Successfully|cut -d" " -f 3` $2
