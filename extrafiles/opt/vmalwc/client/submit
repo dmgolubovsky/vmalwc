@@ -37,8 +37,8 @@ case "$1" in
 		line1="X-Image=$img"
 		line2="X-Exec=$pgm $@"
 		(
-			echo -- "$line1"
-			echo -- "$line2"
+			echo "$line1"
+			echo "$line2"
 		) > /var/vmalwc/inbox/${rand}.${jn}.desktop
 		exit
 		;;
