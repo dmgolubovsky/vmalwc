@@ -200,24 +200,29 @@ ssh-keyscan -v -p 2222 -T 20 -t dsa,ecdsa,ed25519 localhost
 
 cd $WDIR
 
-vmon=`find . -name "$$-loadcore*.monitor" || exit 0`
+
+stopkvm() {
+	cd $WDIR
+	vmon=`find . -name "$$-loadcore*.monitor" || exit 0`
+	[ ! -z "$vmon" ] && echo quit | socat stdio "unix-connect:$vmon"
+	sleep 1
+	pidf=`find . -name "$$-loadcore*.pid" || exit 0`
+	[ ! -z "$pidf" ] kill -INT `cat $pidf`
+}
 
 if ! ( seq 0 20 100 | while read ; do sleep 1 ; echo $REPLY ; done | \
 	zenity --progress --auto-close --no-cancel --text="Press Esc for console window") ; then
 
 	xterm -fn $FONT -fg lightgreen -bg black -title "$name: Console [$$]" -geometry 100x40 \
-		-e ssh -q -o StrictHostKeyChecking=no -p 2222 localhost && \
-		(echo quit | socat stdio "unix-connect:$vmon")
+		-e ssh -q -o StrictHostKeyChecking=no -p 2222 localhost && stopkvm
 
 else
-
 	while true ; do
 		[ -e $TOP/workarea/sdme/shutdown.me ] && {
-			(echo quit | socat stdio "unix-connect:$vmon")
+			stopkvm
 			exit
 		}
 		sleep 1
 	done
-
 fi
 
