@@ -9,4 +9,4 @@
         exit 1
 }
 
-dkrimage `docker build -q - <$1 | tee /dev/stderr |grep ^Successfully|cut -d" " -f 3` $2
+/opt/bin/dkrimage `docker build -q - <$1 | tee /dev/stderr |grep ^Successfully|cut -d" " -f 3` $2

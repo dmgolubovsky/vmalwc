@@ -55,4 +55,4 @@ docker rm $pkghash
 	btrfs prop set -ts $imgname ro true
 ) 2>&1 >/dev/null
 
-findapps
+/opt/bin/findapps

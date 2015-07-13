@@ -1,0 +1,7 @@
+# Path to container outbox
+
+[Unit]
+Description=Watch for a container outbox for job files to appear there
+
+[Path]
+DirectoryNotEmpty=/var/vmalwc/boxes/%f/outbox

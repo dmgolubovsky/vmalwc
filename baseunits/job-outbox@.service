@@ -1,0 +1,9 @@
+# A service to be activated when container outbox is not empty
+
+[Unit]
+Description=When new file appears in the container outbox, remove all files older than 2 hr
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/find /var/vmalwc/boxes/%f/outbox -mmin +120 -delete
+
