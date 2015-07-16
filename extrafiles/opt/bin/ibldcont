@@ -1,0 +1,40 @@
+#! /bin/bash -ex
+
+[ -z "$1" ] && {
+	tty -s && echo "Usage: `basename $1` file.ibld" >&2
+	exit 1
+}
+
+toimg=`grep "^#TO" $1 | cut -d" " -f 2 | sed 's/=/_/g'`
+frimg=`grep "^#FROM" $1 | cut -d" " -f 2 | sed 's/=/_/g'`
+
+( [ -z $toimg ] || [ -z $frimg ] ) && {
+	echo "Both from and to images should be specified" >&2
+	exit 1
+}
+
+[ "$toimg" = "frimg" ] && {
+	echo "From and to images should not have the same name" >&2
+	exit 1
+}
+
+[ ! -d /var/lib/machines/$frimg ] && {
+	echo "Image $frimg does not exist" >&2
+	exit 1
+}
+
+(btrfs sub del /var/lib/machines/$toimg || exit 0)
+
+btrfs sub snap /var/lib/machines/$frimg /var/lib/machines/$toimg
+
+/usr/bin/systemd-nspawn -D /var/lib/machines/$toimg \
+        --bind-ro=/etc/resolv.conf \
+        --bind-ro=/etc/localtime \
+        --bind-ro=$1:/`basename $1` \
+        --setenv=LANG=en_US.UTF-8 \
+        --setenv=DEBIAN_FRONTEND=noninteractive \
+        /bin/sh /`basename $1`
+
+btrfs prop set -ts /var/lib/machines/$toimg ro true
+
+/opt/bin/findapps

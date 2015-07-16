@@ -34,6 +34,19 @@ dockerfile() {
 	/opt/bin/df2img $1 $pkgn 2>&1 >/var/vmalwc/boxes/$cont/outbox/$pkgn.log
 }
 
+# Process an .ibld file as a request to build a package. The source package name
+# should be provided as #FROM xxx comment in the build script body. The desired target
+# package name should be provided as #TO xxx comment in the build script body.
+# ibld scripts are regular shell scripts; they are processed via running /bin/sh
+# in the snapshot of the source container.
+
+ibld() {
+	cd /tmp
+	pkgn=`grep "^#TO" $1 | cut -d" " -f 2 | sed 's/=/_/g'`
+	[ -z $pkgn ] && return
+	/opt/bin/ibldcont $1 2>&1 >/var/vmalwc/boxes/$cont/outbox/$pkgn.log
+}
+
 # Process an .action file as a request for a system action. Action files are mainly
 # for large scale actions like shutdown or terminate a container, so often the desired
 # action is contained in a file name.
@@ -72,6 +85,9 @@ for f in $dir/* ; do
 		;;
 		dockerfile)
 			dockerfile $newf
+		;;
+		ibld)
+			ibld $newf
 		;;
 		*)
 			echo "`basename $0`: file name suffix of $f is not supported" >&2

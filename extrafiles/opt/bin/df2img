@@ -4,9 +4,9 @@
 # Assuming that a http server is running at localhost:8080 and /zzz
 # is the directory served over http.
 
-[ -z "$2" ] && {
+[ -z "$2" ] && tty -s && {
         echo Usage: `basename $0` dockerfile imagename
         exit 1
 }
 
-/opt/bin/dkrimage `docker build -q - <$1 | tee /dev/stderr |grep ^Successfully|cut -d" " -f 3` $2
+/opt/bin/dkrimage `docker build -q - <$1 | tee /proc/self/fd/2 |grep ^Successfully|cut -d" " -f 3` $2
