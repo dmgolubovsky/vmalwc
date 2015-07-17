@@ -132,7 +132,9 @@ coreos:
         ExecStartPre=/usr/bin/unzip /media/configvirtfs/opt.vmalwc.zip
         ExecStartPre=/opt/bin/mount9ptags
         ExecStartPre=/opt/vmalwc/btrfs_cleanup
+        ExecStartPre=/usr/bin/systemctl stop update-engine.service
         ExecStart=/opt/bin/findapps
+        ExecStartPost=/usr/bin/systemctl mask update-engine.service
     - name: remove-default-user.service
       command: start
       content: |
@@ -182,9 +184,20 @@ rm -f $TOP/workarea/sdme/*
 
 cpid=0
 
+waitssh() {
+	while true ; do
+		s=`echo "" | socat stdio localhost:2222 | grep -i SSH | wc -l`
+		if [ $s -ne 0 ] ; then
+			return
+		fi
+		sleep 1
+	done
+}
+
 if ! ( seq 0 20 100 | while read ; do sleep 1 ; echo $REPLY ; done | \
 	zenity --progress --auto-close --no-cancel --text="Press Esc for console window") ; then
 	(
+		
 		FONT=${FONT:-terminus-16}
 		ssh-keyscan -v -p 2222 -T 20 -t dsa,ecdsa,ed25519 localhost
 
