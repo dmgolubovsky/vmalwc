@@ -131,84 +131,84 @@ func main () {
 				os.Exit(1)
 			case "":
 				break
-			case "-list":
+			case "-list":	//+ H: list existing jobs
 				lst := listjobs()
 				if len(lst) > 0 {
 					prtjobs(lst, prtmode)
 				}
 				os.Exit(0)
-			case "-find":
+			case "-find":	//+ H: find jobs by job ID glob
 				findjobs()
 				os.Exit(0)
-			case "-purge":
+			case "-purge":	//+ H: remove files from not running jobs
 				purgejobs()
 				os.Exit(0)
-			case "-log":
+			case "-log":	//+ H: print log of the job wih given job ID
 				joblog(prtmode)
 				os.Exit(0)
-			case "-stop":
+			case "-stop":	//+ H: gently stop the job wih given job ID
 				stopjob()
 				os.Exit(0)
-			case "-kill":
+			case "-kill":	//+ H: stop hard the job wih given job ID
 				killjob()
 				os.Exit(0)
-			case "-showlib":
+			case "-showlib"://+ M: list all currently defined libraries
 				if pfxlib != nil {
 					prtlibs(pfxlib, prtmode)
 				}
 				os.Exit(0)
-			case "-user":
+			case "-user":	//+ J: mount user's home directory into the VM
 				if job.user == nil {
 					fmt.Fprintln(os.Stderr, "Cannot obtain current user information")
 					os.Exit(1)
 				}
 				job.uimp = true
-			case "-app":
+			case "-app":	//+ R: reserved for future extensions
 				i++
 				job.desktop = pargs[i]
 				skip = true
-			case "-lpfx":
+			case "-lpfx":	//+ X: pass encoded library access rules, not to be specified by user
 				i++
 				e := smlib.DecJsonGzipB64(pargs[i], &pfxlib)
 				if e != nil {
 					fmt.Fprintln(os.Stderr, "Library prefix decode: " , e)
 				}
 				skip = true
-			case "-audio":
+			case "-audio":	//+ J: allow host audio access in this job
 				job.audio = true
 				job.pulseaddr = "tcp:10.0.2.200:4713"
-			case "-video":
+			case "-video":	//+ J: allow host video (X11) access in this job
 				job.video = true
 				job.xservaddr = "tcp:10.0.2.100:6000"
 				job.xservdsp = "10.0.2.100:0"
-			case "-make":
+			case "-make":	//+ H: invoke make automatically rather than just create a Makefile
 				job.make = true
-			case "-quiet":
+			case "-quiet":	//+ J: suppress output frpom make (invoke with -q)
 				job.quiet = true
-			case "-kernel":
+			case "-kernel":	//+ J: path to the kernel to be loaded
 				i++
 				job.kernel = pargs[i]
 				skip = true
-			case "-id":
+			case "-id":	//+ J: specify desired job ID
 				i++
 				job.idraw = pargs[i]
 				job.id = strings.Replace(pargs[i], ".", "", -1)
 				skip = true
-			case "-idprt":
+			case "-idprt":	//+ J: when -make and -quiet specified, print job ID after it starts
 				job.idprt = true
-			case "-kvm":
+			case "-kvm":	//+ J: path to the KVM executable
 				i++
 				job.kvm = pargs[i]
 				skip = true
-			case "-hostname":
+			case "-hostname"://+ J: set job VM hostname (may be overridden by the job itself)
 				i++
 				job.hostname = filepath.Base(pargs[i])
 				skip = true
-			case "-workdir":
+			case "-workdir"://+ J: specify the working directory
 				i++
 				job.wdir = pargs[i]
 				skip = true
-			case "-mem":
+			case "-mem":	//+ S: specify memory (in K, M, G) allocated to the step or job (if used outside of a step)
 				i++
 				bsize, err := bytesize.Parse(pargs[i])
 				if err != nil {
@@ -221,7 +221,7 @@ func main () {
 					job.mmegs = bsize / (1024 * 1024)
 				}
 				skip = true
-			case "-sysin":
+			case "-sysin":	//+ S: specify host file to be passed to the step standard input
 				i++
 				if curstep != nil {
 					p, _, e := transpath(pargs[i], pfxlib)
@@ -232,7 +232,7 @@ func main () {
 					curstep.sysin = p
 				}
 				skip = true
-			case "-sysout":
+			case "-sysout":	//+ S: specify host path where standard output of the step will be written
 				i++
 				if curstep != nil {
 					var wr bool
@@ -248,30 +248,30 @@ func main () {
 					curstep.sysout = p
 				}
 				skip = true
-			case "-host":
+			case "-host":	//+ S: allow host control in the step
 				i++
 				if curstep != nil {
 					curstep.host = true
 				}
-			case "-xkernel":
+			case "-xkernel"://+ S: kernel path to be used in the jobs submitted from within this VM
 				i++
 				if curstep != nil {
 					curstep.xkernel = pargs[i]
 				}
 				skip = true
-			case "-info":
+			case "-info":	//+ S: path to the directory where host files will be copied to be 9p-mounted into the VM
 				i++
 				if curstep != nil {
 					curstep.infopath = pargs[i]
 				}
 				skip = true
-			case "-copy":
+			case "-copy":	//+ S: host file to be copied to the directory specified by -info, use multiple times if needed
 				i++
 				if curstep != nil {
 					curstep.copyfiles = append(curstep.copyfiles, pargs[i])
 				}
 				skip = true
-			case "-fwd":
+			case "-fwd":	//+ S: host port:VM port, enable TCP forward from host to VM
 				i++
 				if curstep != nil {
 					ps := strings.Split(pargs[i], ":")
@@ -288,7 +288,7 @@ func main () {
 					curstep.hostfwd = append(curstep.hostfwd, HostFwd{int(hp), int(gp),})
 				}
 				skip = true
-			case "-lbrst":
+			case "-lbrst":	//+ H: pass the library restriction information to the jobs that this job will submit on the host
 				i++
 				if curstep != nil {
 					curstep.lbrst = true
@@ -296,7 +296,7 @@ func main () {
 						curstep.libpfx = &LibPrefix{}
 					}
 				}
-			case "-xdisplay":
+			case "-xdisplay"://+ J: forward guest video requests to this X display
 				i++
 				x, e := strconv.ParseInt(pargs[i], 10, 32)
 				if e != nil {
@@ -305,7 +305,7 @@ func main () {
 				}
 				job.xdisplay = int(x)
 				skip = true
-			case "-lib":
+			case "-lib":	//+ S: start library definition at the step or job level
 				i++
 				curlib = newlib()
 				curlib.name = pargs[i]
@@ -322,7 +322,7 @@ func main () {
 					curlib.libtype = NOTSET
 				}
 				skip = true
-			case "-utag":
+			case "-utag":	//+ L: for 9p libraries, specify that should be mounted under user's home directory
 				i++
 				if curlib != nil && job.uimp && strings.HasPrefix(curlib.path, job.user.HomeDir) {
 					curlib.tag = "H#" + pargs[i]

@@ -7,6 +7,7 @@
 
 toimg=`grep "^#TO" $1 | cut -d" " -f 2 | sed 's/=/_/g'`
 frimg=`grep "^#FROM" $1 | cut -d" " -f 2 | sed 's/=/_/g'`
+phome=`grep "^#PHOME" $1 | cut -d" " -f 2 | sed 's/=/_/g'`
 
 ( [ -z $toimg ] || [ -z $frimg ] ) && {
 	echo "Both from and to images should be specified" >&2
@@ -38,3 +39,10 @@ btrfs sub snap /var/lib/machines/$frimg /var/lib/machines/$toimg
 btrfs prop set -ts /var/lib/machines/$toimg ro true
 
 /opt/bin/findapps
+
+[ "$phome" = "yes" ] &&  [ -d /mnt/persistent_home ] && {
+	echo "Creating persistent home directory for container $toimg"
+	mkdir -p /mnt/persistent_home/$toimg
+}
+
+echo "Done"

@@ -38,7 +38,8 @@ dockerfile() {
 # should be provided as #FROM xxx comment in the build script body. The desired target
 # package name should be provided as #TO xxx comment in the build script body.
 # ibld scripts are regular shell scripts; they are processed via running /bin/sh
-# in the snapshot of the source container.
+# in the snapshot of the source container. If #PHOME yes comment is found in the
+# .ibld file then persistent home directory will be created for the container.
 
 ibld() {
 	cd /tmp
