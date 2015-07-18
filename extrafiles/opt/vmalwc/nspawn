@@ -53,6 +53,10 @@ dbrs=`cd $IMGDIR && find . -name dbus-launch | head -n 1 | sed 's/^\.\///g'`
 	--setenv=LANG=en_US.UTF-8 \
 	--setenv=DISPLAY=$DISPLAY \
 	--setenv=PULSE_SERVER=$PULSE_SERVER \
+	--setenv=HOST_JOB_ENTRY=$HOST_JOB_ENTRY \
+	--setenv=hostdisplay=$hostdisplay \
+	--setenv=hostworkdir=$hostworkdir \
+	--setenv=hostaddr=$hostaddr \
 	--setenv=PATH=$PATH:/opt/vmalwc/bin:$HOME/bin \
 	--setenv=CONTIMAGE=$cont \
 	--setenv=HOMEIMAGE=$hcont \

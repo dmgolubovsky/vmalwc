@@ -1,4 +1,4 @@
-#! /bin/bash -ex
+i#! /bin/bash -ex
 
 # stolen from the original coreos run script.
 
@@ -79,6 +79,7 @@ sshkey=$(find_ssh_keys)
 (
 	echo USER=$USER
 	echo HOME=$HOME
+	echo hostaddr=`ip route get 1 | awk '{print $NF ; exit}'`
 ) > $CONFIG_DRIVE/user_environment
 
 # Zip the opt/vmalwc directory on the host to place the zipfile to the config drive
