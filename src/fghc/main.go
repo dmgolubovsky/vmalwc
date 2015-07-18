@@ -322,19 +322,19 @@ func main () {
 					curlib.libtype = NOTSET
 				}
 				skip = true
-			case "-utag":	//+ L: for 9p libraries, specify that should be mounted under user's home directory
+			case "-utag":	//+ L: for 9p libraries, specify that should be mounted under user's home directory with given tag
 				i++
 				if curlib != nil && job.uimp && strings.HasPrefix(curlib.path, job.user.HomeDir) {
 					curlib.tag = "H#" + pargs[i]
 				}
 				skip = true
-			case "-tag":
+			case "-tag":	//+ L: for 9p libraries, specify that should be mounted under the default location with given tag
 				i++
 				if curlib != nil {
 					curlib.tag = pargs[i]
 				}
 				skip = true
-			case "-path":
+			case "-path":	//+ L: path to library medium file or directory on the host
 				i++
 				if curlib != nil {
 					var wr bool
@@ -349,7 +349,7 @@ func main () {
 					}
 				}
 				skip = true
-			case "-save":
+			case "-save":	//+ L: for intermediate libraries, save at this host path
 				i++
 				if curlib != nil {
 					var wr bool
@@ -364,11 +364,11 @@ func main () {
 					}
 				}
 				skip = true
-			case "-ro":
+			case "-ro":	//+ L: allow only read-only access to the library
 				if curlib != nil {
 					curlib.write = false
 				}
-			case "-rw":
+			case "-rw":	//+ L: allow read-write access to the library
 				if curlib != nil {
 					if curlib.locked && !curlib.write {
 						fmt.Fprintln(os.Stderr, "Canot override write mode: ", curlib.name)
@@ -376,7 +376,7 @@ func main () {
 					}
 					curlib.write = true
 				}
-			case "-new":
+			case "-new":	//+ L: create new intermediate library, file name will be chosen automatically
 				i++
 				if curlib != nil {
 					bsize, err := bytesize.Parse(pargs[i])
@@ -388,7 +388,7 @@ func main () {
 					}
 				}
 				skip = true
-			case "-from":
+			case "-from":	//+ L: create an intermediate library as copy of an existing permanent library
 				i++
 				if curlib != nil {
 					curlib.from, _, e = transpath(pargs[i], pfxlib)
@@ -398,12 +398,12 @@ func main () {
 					}
 				}
 				skip = true
-			case "-snap":
+			case "-snap":	//+ L: use the library in snapshot mode: all changes will be lost
 				if curlib != nil {
 					curlib.snap = true
 					curlib.locked = false
 				}
-			case "-type":
+			case "-type":	//+ L: specify library type if it cannot be determined automatically
 				i++
 				if curlib != nil {
 					if curlib.libtype != NOTSET {
@@ -427,7 +427,7 @@ func main () {
 					}
 				}
 				skip = true
-			case "-step":
+			case "-step":	//+ S: opens a step scope
 				i++
 				curstep = &Step{}
 				job.steps[pargs[i]] = curstep
@@ -437,13 +437,13 @@ func main () {
 				curstep.hje = "tcp:10.0.2.150:77"
 				curstep.infopath = "/dev/null"
 				skip = true
-			case "-exec":
+			case "-exec":	//+ S: specify program and its arguments to be executed in the current step
 				i++
 				if curstep != nil {
 					curstep.exec = pargs[i]
 				}
 				skip = true
-			case "-after":
+			case "-after":	//+ S: set explicit dependency of the current step upon another step
 				i++
 				if curstep != nil {
 					 curstep.add_dep("step_" + strings.Replace(pargs[i], ".", "", -1))
