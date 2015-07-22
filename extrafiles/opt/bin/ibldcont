@@ -43,6 +43,7 @@ btrfs prop set -ts /var/lib/machines/$toimg ro true
 [ "$phome" = "yes" ] &&  [ -d /mnt/persistent_home ] && {
 	echo "Creating persistent home directory for container $toimg"
 	mkdir -p /mnt/persistent_home/$toimg
+	chown $USER /mnt/persistent_home/$toimg
 }
 
 echo "Done"

@@ -5,4 +5,5 @@ Description=Activate when new files appear in the contaner inbox
 
 [Service]
 Type=simple
+EnvironmentFile=-/etc/vmalwc/user_environment
 ExecStart=/opt/bin/submitjob %f
