@@ -46,6 +46,7 @@ ibld() {
 	pkgn=`grep "^#TO" $1 | cut -d" " -f 2 | sed 's/=/_/g'`
 	[ -z $pkgn ] && return
 	/opt/bin/ibldcont $1 2>&1 >/var/vmalwc/boxes/$cont/outbox/$pkgn.log
+	echo "***Build finished status $?***" >>/var/vmalwc/boxes/$cont/outbox/$pkgn.log
 }
 
 # Process an .action file as a request for a system action. Action files are mainly
