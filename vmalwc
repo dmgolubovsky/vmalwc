@@ -13,7 +13,7 @@ fi
 killall -9 pulseaudio
 pactl info >/dev/null
 
-$HOME/bin/patunnel 2>&1 >/dev/null &
+[ `ps aux | grep patunnel | wc -l` = 0 ] && $HOME/bin/patunnel 2>&1 >/dev/null &
 
 PTPID=$!
 
