@@ -1,4 +1,4 @@
-i#! /bin/bash -ex
+#! /bin/bash -ex
 
 # stolen from the original coreos run script.
 
