@@ -130,6 +130,7 @@ coreos:
         ExecStartPre=/bin/cp /media/configvirtfs/user_info /etc/vmalwc/environment
         ExecStartPre=/bin/cp /media/configvirtfs/user_environment /etc/vmalwc/user_environment
         ExecStartPre=/bin/sh -c "echo NUID=`id -u $USER` >> /etc/vmalwc/user_environment"
+        ExecStartPre=/sbin/usermod -u `id -u $USER` $USER
         ExecStartPre=/usr/bin/unzip /media/configvirtfs/opt.vmalwc.zip
         ExecStartPre=/opt/bin/mount9ptags
         ExecStartPre=/opt/vmalwc/btrfs_cleanup
@@ -176,8 +177,6 @@ EOF
 		cat $s | sed "s/^/${indent}    /g"
 done
 ) >> $CONFIG_DRIVE/openstack/latest/user_data
-
-cat $CONFIG_DRIVE/openstack/latest/user_data
 
 mkdir -p $TOP/workarea/sdme
 
