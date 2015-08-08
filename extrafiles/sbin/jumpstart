@@ -30,7 +30,7 @@ for f in `cat /proc/cmdline` ; do
 			d=$(echo -n "$f" | sed 's/^.*\@//' | base64 -d)
 		;;
 		exec=Z*)
-			d=$(echo -n "$f" | sed 's/^.*Z//' | gzip -d - | base64 -d)
+			d=$(echo -n "$f" | sed 's/^exec=Z//' | base64 -d | gzip -d - )
 		;;
 		*)
 	esac
