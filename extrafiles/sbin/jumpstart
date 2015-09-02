@@ -8,11 +8,15 @@
 d=""
 sysin=/dev/null
 sysout=/dev/console
+poweroff=reboot
 
 for f in `cat /proc/cmdline` ; do
 	case $f in
 		exec=none)
 			exit
+		;;
+		poweroff=*)
+			poweroff=$(echo -n "$f" | cut -d"=" -f 2)
 		;;
 		sysin=*)
 			sysin=$(echo -n "$f" | cut -d"=" -f 2)
@@ -25,6 +29,10 @@ for f in `cat /proc/cmdline` ; do
 		;;
 		pulse=*)
 			export PULSE_SERVER=$(echo -n "$f" | cut -d"=" -f 2)
+		;;
+		exec=shell)
+			/sbin/getty -L -i -n -l /bin/sh hvc0 115200 vt100
+			$poweroff
 		;;
 		exec=@*)
 			d=$(echo -n "$f" | sed 's/^.*\@//' | base64 -d)
@@ -40,4 +48,4 @@ done
 ) 3<$sysin 2>&1 >$sysout
 
 echo EXITCODE: $?
-reboot
+$poweroff

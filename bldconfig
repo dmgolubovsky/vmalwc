@@ -15,12 +15,12 @@ allows="$enables slirp"
 
 # Build config for buildroot
 
-BRVERSION=2015.02
+BRVERSION=2015.05
 BRURL=http://buildroot.net/downloads/buildroot-${BRVERSION}.tar.bz2
 
 # Build config for kernel
 
-KERVERSION=4.0.4
+KERVERSION=4.1.6
 KERURL=https://www.kernel.org/pub/linux/kernel/v4.x/linux-$KERVERSION.tar.xz
 
 # Build config for ascii2uni

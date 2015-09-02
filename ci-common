@@ -33,10 +33,10 @@ $TOP/build-ascii2uni
 
 $TOP/build-kernel
 
-$TOP/build-gopgm
+#$TOP/build-gopgm
 
-$TOP/build-kvm
+#$TOP/build-kvm
 
-kvm-ok && $TOP/test-kvm
+#kvm-ok && $TOP/test-kvm
 
 
